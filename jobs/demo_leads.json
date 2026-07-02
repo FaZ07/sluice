@@ -1,0 +1,17 @@
+{
+  "job_id": "leads-interior-chennai-001",
+  "client": "Demo Client (lead-gen gig)",
+  "title": "Interior designers in Chennai — verified business leads",
+  "action_id": "gmaps_leads",
+  "params": { "query": "interior designers in Chennai", "limit": 50 },
+  "fields": [
+    { "name": "business_name", "type": "string",   "required": true },
+    { "name": "phone",         "type": "phone_in", "required": true },
+    { "name": "email",         "type": "email",    "required": false },
+    { "name": "website",       "type": "url",      "required": false },
+    { "name": "area",          "type": "string",   "required": false },
+    { "name": "rating",        "type": "number",   "required": false }
+  ],
+  "dedupe_keys": ["business_name", "phone"],
+  "output_dir": "deliverables"
+}

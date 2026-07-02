@@ -1,0 +1,16 @@
+{
+  "job_id": "products-electronics-amzin-001",
+  "client": "Demo Client (price-monitoring gig)",
+  "title": "Amazon.in electronics — price & seller snapshot",
+  "action_id": "amazon_search",
+  "params": { "query": "electronics bestsellers", "limit": 25 },
+  "fields": [
+    { "name": "title",  "type": "string", "required": true },
+    { "name": "price",  "type": "number", "required": true },
+    { "name": "mrp",    "type": "number", "required": false },
+    { "name": "rating", "type": "number", "required": false },
+    { "name": "seller", "type": "string", "required": false }
+  ],
+  "dedupe_keys": ["title", "seller"],
+  "output_dir": "deliverables"
+}

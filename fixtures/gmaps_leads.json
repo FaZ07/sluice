@@ -1,0 +1,23 @@
+{
+  "note": "Mock Wire payload — same nested shape as live (data.data.data). Deliberately dirty: dupes, invalid emails/phones/urls, n/a placeholders — so the QA engine has something to prove.",
+  "data": { "data": { "data": [
+    { "business_name": "Studio Verve Interiors", "phone": "+91 98410 12345", "email": "hello@studioverve.in", "website": "studioverve.in", "area": "Adyar", "rating": "4.8" },
+    { "business_name": "DezignCraft Chennai", "phone": "9841098765", "email": "contact@dezigncraft.com", "website": "https://dezigncraft.com", "area": "T. Nagar", "rating": "4.6" },
+    { "business_name": "Urban Nest Interiors", "phone": "098400 11223", "email": "urbannest@gmail.com", "website": "urbannestchennai.com", "area": "Velachery", "rating": "4.7" },
+    { "business_name": "Studio  Verve Interiors", "phone": "9841012345", "email": "HELLO@studioverve.in", "website": "www.studioverve.in", "area": "Adyar", "rating": "4.8" },
+    { "business_name": "Casa Bella Designs", "phone": "044-2461 1234", "email": "info@casabella", "website": "casabella.in", "area": "Mylapore", "rating": "4.5" },
+    { "business_name": "The Design Loft", "phone": "78450 66778", "email": "", "website": "thedesignloft.in", "area": "Anna Nagar", "rating": "4.9" },
+    { "business_name": "Aikya Interiors", "phone": "12345", "email": "aikya@outlook.com", "website": "", "area": "Porur", "rating": "4.2" },
+    { "business_name": "Maple & Teak Studio", "phone": "+91 90030 44556", "email": "studio@mapleteak.in", "website": "mapleteak.in", "area": "OMR", "rating": "4.4" },
+    { "business_name": "DezignCraft Chennai", "phone": "9841098765", "email": "contact@dezigncraft.com", "website": "https://dezigncraft.com", "area": "T. Nagar", "rating": "4.6" },
+    { "business_name": "Nirmaan Spaces", "phone": "63801 22334", "email": "n/a", "website": "nirmaanspaces.com", "area": "Tambaram", "rating": "3.9" },
+    { "business_name": "Ivory Lane Interiors", "phone": "91 76040 55667", "email": "hello@ivorylane.in", "website": "ivorylane.in", "area": "Nungambakkam", "rating": "4.7" },
+    { "business_name": "Habitat Harmony", "phone": "89393 11224", "email": "reach@habitatharmony.in", "website": "", "area": "Guindy", "rating": "—" },
+    { "business_name": "Elements Decor Co", "phone": "0442478 9900", "email": "elements@decor.co.in", "website": "elementsdecor.co.in", "area": "Kilpauk", "rating": "4.3" },
+    { "business_name": "Whitespace Studio", "phone": "95000 88990", "email": "", "website": "", "area": "Perungudi", "rating": "4.1" },
+    { "business_name": "Vastra Interiors", "phone": "", "email": "vastra@interiors.in", "website": "vastrainteriors.in", "area": "Chromepet", "rating": "4.0" },
+    { "business_name": "Oak & Ochre", "phone": "73584 99001", "email": "studio@oakochre.in", "website": "oakochre.in", "area": "Besant Nagar", "rating": "4.8" },
+    { "business_name": "Lumen Living", "phone": "84890 33445", "email": "hello@lumenliving.in", "website": "lumenliving.in", "area": "Sholinganallur", "rating": "4.5" },
+    { "business_name": "TrueForm Studio", "phone": "98404 77889", "email": "trueform@studio.in", "website": "not a website", "area": "Egmore", "rating": "4.2" }
+  ] } }
+}

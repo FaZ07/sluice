@@ -1,0 +1,8 @@
+# generated client packages — rebuild with: python sluice.py demo
+deliverables/
+
+# secrets
+.env
+
+__pycache__/
+*.pyc

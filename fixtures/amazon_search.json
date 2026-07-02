@@ -1,0 +1,17 @@
+{
+  "note": "Mock Wire payload — live shape. Dirt: ₹ prefixes, Indian digit grouping (1,29,900), a duplicate listing, a missing required price.",
+  "data": { "data": { "data": [
+    { "title": "boAt Airdopes 141 TWS Earbuds", "price": "₹1,099", "mrp": "₹4,490", "rating": "4.1", "seller": "RetailNet" },
+    { "title": "Noise ColorFit Pulse 4 Smartwatch", "price": "1,499", "mrp": "₹5,999", "rating": "4.2", "seller": "Appario" },
+    { "title": "Mi Power Bank 3i 20000mAh", "price": "₹1,899", "mrp": "₹2,499", "rating": "4.4", "seller": "RetailNet" },
+    { "title": "Samsung Galaxy M35 5G 8GB/128GB", "price": "₹17,999", "mrp": "₹24,999", "rating": "4.3", "seller": "Appario" },
+    { "title": "HP 15s Ryzen 5 16GB/512GB Laptop", "price": "₹41,990", "mrp": "₹52,105", "rating": "4.2", "seller": "HPWorld" },
+    { "title": "Sony WH-CH520 Wireless Headphones", "price": "₹3,989", "mrp": "₹5,990", "rating": "4.4", "seller": "CloudtailLite" },
+    { "title": "boAt Airdopes 141 TWS Earbuds", "price": "₹1,099", "mrp": "₹4,490", "rating": "4.1", "seller": "RetailNet" },
+    { "title": "LG 1.5 Ton 5-Star Split AC", "price": "₹46,490", "mrp": "₹75,990", "rating": "4.5", "seller": "LGOfficial" },
+    { "title": "Apple MacBook Air M3 13-inch", "price": "₹1,04,990", "mrp": "₹1,14,900", "rating": "4.7", "seller": "Appario" },
+    { "title": "Dyson V8 Absolute Cordless Vacuum", "price": "", "mrp": "₹34,900", "rating": "4.6", "seller": "DysonIndia" },
+    { "title": "Fire-Boltt Ninja Call Pro Plus", "price": "₹999", "mrp": "₹19,999", "rating": "3.8", "seller": "RetailNet" },
+    { "title": "Canon PIXMA MG2577s Printer", "price": "₹2,449", "mrp": "₹3,395", "rating": "n/a", "seller": "CloudtailLite" }
+  ] } }
+}
