@@ -5,12 +5,18 @@ CLI:
   python sluice.py run jobs/demo_leads.json     # fulfil one job spec
   python sluice.py demo                         # run every bundled demo job
 
-A "job" is one client gig: which Wire action to call, which fields the
+A "job" is one client gig: where the rows come from, which fields the
 client is paying for, and what counts as a duplicate. Everything else —
 fetch, clean, grade, package — is automatic.
+
+Row source (exactly one per job):
+  "action_id": "..."      Wire action (scraping gigs; live mode costs credits)
+  "csv_source": "..."     client-supplied CSV file, or a list of CSVs to merge
+                          (data-cleaning gigs; offline, zero credits)
 """
 from __future__ import annotations
 
+import csv
 import json
 import sys
 from pathlib import Path
@@ -22,9 +28,23 @@ from deliver import deliver
 ROOT = Path(__file__).parent
 
 
+def read_csv_rows(source: str | list[str]) -> list[dict]:
+    """Client-supplied CSV(s) -> raw rows. utf-8-sig eats Excel's BOM; a list
+    of paths is merged in order (multi-file cleaning gigs)."""
+    paths = [source] if isinstance(source, str) else list(source)
+    rows: list[dict] = []
+    for p in paths:
+        with open(ROOT / p, newline="", encoding="utf-8-sig") as fh:
+            rows.extend(dict(r) for r in csv.DictReader(fh))
+    return rows
+
+
 def run_job(job_path: Path) -> dict:
     job = json.loads(job_path.read_text(encoding="utf-8"))
-    raw = wire.fetch(job["action_id"], job.get("params", {}))
+    if "csv_source" in job:
+        raw = read_csv_rows(job["csv_source"])
+    else:
+        raw = wire.fetch(job["action_id"], job.get("params", {}))
     result = engine.process(raw, job)
     package = deliver(job, result, ROOT / job.get("output_dir", "deliverables"))
     qa = result["qa"]

@@ -1,0 +1,15 @@
+{
+  "job_id": "clean-crm-export-001",
+  "client": "Demo Client (data-cleaning gig)",
+  "title": "Messy CRM export — cleaned, deduped, verified",
+  "csv_source": "fixtures/client_messy_crm.csv",
+  "fields": [
+    { "name": "business_name", "type": "string",   "required": true },
+    { "name": "contact_phone", "type": "phone_in", "required": true },
+    { "name": "email",         "type": "email",    "required": false },
+    { "name": "website",       "type": "url",      "required": false },
+    { "name": "city",          "type": "string",   "required": false }
+  ],
+  "dedupe_keys": ["business_name", "contact_phone"],
+  "output_dir": "deliverables"
+}

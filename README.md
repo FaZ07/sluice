@@ -52,6 +52,19 @@ python -m unittest discover -s tests    # 54 tests, offline, deterministic
    every row verifiable at the source, sha256 in `manifest.json` if anyone
    disputes what was delivered.
 
+## Data-cleaning gigs (no Wire, zero credits)
+
+When the *client* supplies the messy data, SLUICE needs no scraping at all:
+put `"csv_source": "path/to/client.csv"` in the job spec instead of an
+`action_id` (a list of paths merges multiple files). Same engine, same
+deliverable package, fully offline — this is the gig you can fulfil the day
+you publish, with no API key and no variable cost. Demo:
+
+```bash
+python sluice.py run jobs/demo_clean_csv.json
+# 16-row messy CRM export -> 11 clean rows (3 dupes, 2 rejects, grade B)
+```
+
 ## Mock → Live (the only switch)
 
 ```env
