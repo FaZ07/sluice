@@ -337,6 +337,9 @@ def build_ass(events, layout="fit", hook=None, hook_secs=3.0, clip_secs=None,
         # hook: black text on white box, top
         "Style: Hook,Arial,64,&H00000000,&H00000000,&H00FFFFFF,&H00FFFFFF,"
         "-1,0,0,0,100,100,0,0,3,18,0,5,80,80,0,1",
+        # narrator words (story mode): cyan so viewers can tell who's talking
+        "Style: Narr,Arial,100,&H00FFF000,&H00FFF000,&H00000000,&H64000000,"
+        "-1,0,0,0,100,100,0,0,1,8,3,5,60,60,0,1",
         # word-by-word: one big yellow word that pops in
         "Style: Word,Arial,112,&H0000E6FF,&H0000E6FF,&H00000000,&H64000000,"
         "-1,0,0,0,100,100,0,0,1,8,3,5,60,60,0,1",
@@ -360,11 +363,13 @@ def build_ass(events, layout="fit", hook=None, hook_secs=3.0, clip_secs=None,
         lines.append("Dialogue: 3,%s,%s,Hook,,0,0,0,,{\\pos(%d,%d)}%s" % (
             fmt_ass_time(max(0.0, clip_secs - 3.0)), fmt_ass_time(clip_secs),
             W // 2, 960, ass_escape(endcard)))
-    for s, e, t in events:
-        if word_mode:
-            lines.append("Dialogue: 0,%s,%s,Word,,0,0,0,,{\\pos(%d,%d)"
+    for ev in events:
+        s, e, t = ev[0], ev[1], ev[2]
+        style = ev[3] if len(ev) > 3 else ("Word" if word_mode else "Cap")
+        if style in ("Word", "Narr"):
+            lines.append("Dialogue: 0,%s,%s,%s,,0,0,0,,{\\pos(%d,%d)"
                          "\\fscx130\\fscy130\\t(0,90,\\fscx100\\fscy100)}%s" % (
-                             fmt_ass_time(s), fmt_ass_time(e), W // 2, y,
+                             fmt_ass_time(s), fmt_ass_time(e), style, W // 2, y,
                              ass_escape(t).upper()))
         else:
             lines.append("Dialogue: 0,%s,%s,Cap,,0,0,0,,{\\pos(%d,%d)}%s" % (

@@ -1,0 +1,17 @@
+{
+ "campaign": "kai",
+ "name": "kai-story-04",
+ "title": "Kai Cenat Believed In Jason... Then This Happened 😭 #KaiCenat #GTA6",
+ "beats": [
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/day2/p4007.mp4",
+   "start": 1.4,
+   "end": 32,
+   "layout": "stack",
+   "focus": 0.65,
+   "cam": "0:430:390:222",
+   "narr": "Kai Cenat told chat Jason was going to pull this off.",
+   "label": "HE BELIEVED IN JASON"
+  }
+ ]
+}

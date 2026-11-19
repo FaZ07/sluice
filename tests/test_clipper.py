@@ -24,6 +24,44 @@ class TestCompileSpec(unittest.TestCase):
         self.assertTrue(any("min 3s" in p for p in comp.validate(short)))
 
 
+class TestStoryUnits(unittest.TestCase):
+    def test_narr_events_are_cyan_and_offset(self):
+        import story
+        ev = story.narr_events([(0.0, 0.4, "Kai"), (0.5, 0.9, "thought")], 0.15)
+        self.assertTrue(all(e[3] == "Narr" for e in ev))
+        self.assertAlmostEqual(ev[0][0], 0.15)
+        a = clip.build_ass(ev, "stack", word_mode=True)
+        self.assertIn(",Narr,", a)
+
+    def test_even_words_fallback(self):
+        import story
+        w = story.even_words("one two three four", 2.0)
+        self.assertEqual(len(w), 4)
+        self.assertAlmostEqual(w[-1][1], 2.0)
+        self.assertEqual(story.even_words("", 1.0), [])
+
+    def test_align_script_keeps_our_words(self):
+        import story
+        heard = [(0.0, 0.6, " Kaizenit"), (0.6, 0.9, " needed"), (0.9, 1.2, " money")]
+        out = story.align_script("Kai needed money", heard, 2.0)
+        self.assertEqual([w for _, _, w in out], ["Kai", "needed", "money"])
+        self.assertEqual(out[1][:2], (0.6, 0.9))
+        out = story.align_script("Kai Cenat needed money", heard, 2.0)  # 4 vs 3 words
+        self.assertEqual([w for _, _, w in out], ["Kai", "Cenat", "needed", "money"])
+        self.assertAlmostEqual(out[-1][1], 1.2)
+
+    def test_spoken_fixes_names_only_for_voice(self):
+        import story
+        self.assertEqual(story.spoken("Kai Cenat needed money"), "Kai Senat needed money")
+        self.assertEqual(story.spoken("plain text"), "plain text")
+
+    def test_story_validate(self):
+        import story
+        self.assertTrue(story.validate({"campaign": "kai", "beats": []}))
+        self.assertTrue(any("cam" in p for p in story.validate(
+            {"campaign": "kai", "beats": [{"file": "a", "start": 0, "end": 5}]})))
+
+
 class TestTimestamps(unittest.TestCase):
     def test_parse_forms(self):
         self.assertEqual(clip.parse_ts("75"), 75.0)
@@ -283,6 +321,25 @@ class TestRenderReal(unittest.TestCase):
         out = clip.cold_open(src, 5.0, 1.6, d)
         info = clip.probe(out)
         self.assertAlmostEqual(info["dur"], 8.0 + 1.6, delta=0.3)
+        self.assertTrue(info["audio"])
+
+    def test_story_two_beats_with_fake_narrator(self):
+        import story
+
+        def fake_synth(text, voice, out_mp3):
+            subprocess.run([clip.tool("ffmpeg"), "-y", "-v", "error", "-f", "lavfi",
+                            "-i", "sine=frequency=300:duration=1.2", out_mp3], check=True)
+            return [(0.0, 0.5, "HELLO"), (0.6, 1.1, "THERE")]
+
+        spec = {"campaign": "kai", "name": "t-story", "title": "t",
+                "beats": [
+                    {"narr": "hello there", "file": self.src_full, "start": 0, "end": 4,
+                     "cam": "1400:0:520:300", "focus": 0.35, "label": "HOOK"},
+                    {"file": self.src_full, "start": 5, "end": 9, "cam": "1400:0:520:300"}]}
+        out, info = story.build(spec, out_dir=self.td, transcribe=lambda p: [],
+                                synth=fake_synth)
+        self.assertEqual((info["w"], info["h"]), (1080, 1920))
+        self.assertAlmostEqual(info["dur"], 8.0, delta=0.4)
         self.assertTrue(info["audio"])
 
     def test_center_no_subs(self):

@@ -1,0 +1,26 @@
+{
+ "campaign": "kai",
+ "name": "kai-story-01",
+ "title": "Kai Cenat Needed Money In GTA 6... So He Did This 💰 #KaiCenat #GTA6",
+ "beats": [
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/day2/p14048.mp4",
+   "start": 7.4,
+   "end": 28,
+   "layout": "stack",
+   "focus": 0.65,
+   "cam": "0:430:390:222",
+   "narr": "Kai Cenat needed money in GTA 6. So he opened the map.",
+   "label": "KAI NEEDED MONEY"
+  },
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/day2/p14768.mp4",
+   "start": 12.2,
+   "end": 33,
+   "layout": "stack",
+   "focus": 0.65,
+   "cam": "0:430:390:222",
+   "narr": "A few minutes later..."
+  }
+ ]
+}

@@ -1,0 +1,17 @@
+{
+ "campaign": "kai",
+ "name": "kai-story-05",
+ "title": "Kai Cenat Was Just Driving... Then He Found THIS In GTA 6 😳 #KaiCenat #GTA6",
+ "beats": [
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/day2/p18412.mp4",
+   "start": 5.4,
+   "end": 30,
+   "layout": "stack",
+   "focus": 0.65,
+   "cam": "0:430:390:222",
+   "narr": "Kai Cenat was cruising through GTA 6. Then something new popped up on his map.",
+   "label": "WHAT'S ON HIS MAP?"
+  }
+ ]
+}
