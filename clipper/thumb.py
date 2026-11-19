@@ -130,6 +130,54 @@ def neon_text(img, text, cy, size, fill, glow):
     return img
 
 
+def face_box(img):
+    """Largest frontal face (x, y, w, h) via OpenCV Haar cascade, or None.
+
+    OpenCV is an optional accelerator: if it's missing or finds nothing, the
+    caller falls back to a fixed upper-centre zoom.
+    """
+    try:
+        import cv2
+        import numpy as np
+    except Exception:
+        return None
+    gray = cv2.cvtColor(np.array(img.convert("RGB")), cv2.COLOR_RGB2GRAY)
+    minside = max(24, min(gray.shape) // 12)
+    faces = []
+    for name, flip in (("haarcascade_frontalface_default.xml", False),
+                       ("haarcascade_frontalface_alt2.xml", False),
+                       ("haarcascade_profileface.xml", False),
+                       ("haarcascade_profileface.xml", True)):
+        casc = cv2.CascadeClassifier(cv2.data.haarcascades + name)
+        g = cv2.flip(gray, 1) if flip else gray
+        found = casc.detectMultiScale(g, scaleFactor=1.1, minNeighbors=5,
+                                      minSize=(minside, minside))
+        for (x, y, w, h) in found:
+            if flip:
+                x = gray.shape[1] - x - w
+            faces.append((x, y, w, h))
+        if faces:
+            break
+    if not faces:
+        return None
+    return tuple(int(v) for v in max(faces, key=lambda f: f[2] * f[3]))
+
+
+def crop_on_face(img, aspect, scale=2.6):
+    """Head-and-shoulders crop with the given w/h aspect, centred on the face."""
+    fb = face_box(img)
+    if fb is None:
+        return None
+    x, y, w, h = fb
+    ch = min(img.height, int(h * scale))
+    cw = min(img.width, int(ch * aspect))
+    ch = int(cw / aspect)
+    cx, cy = x + w / 2, y + h * 0.75          # face slightly above centre
+    left = int(min(max(cx - cw / 2, 0), img.width - cw))
+    top = int(min(max(cy - ch / 2, 0), img.height - ch))
+    return img.crop((left, top, left + cw, top + ch))
+
+
 def make_sunset(src, out, text, t=None, layout="stack", cam=None, focus=0.5):
     """Sunset background + framed reaction face + neon 'GTA 6' + hook."""
     if t is None:
@@ -141,18 +189,29 @@ def make_sunset(src, out, text, t=None, layout="stack", cam=None, focus=0.5):
         face_src = frame.crop((x, y, x + cw, y + ch))
     else:
         face_src = cover(frame, int(frame.height * 0.75), frame.height, focus, 0.5)
+    # Zoom into the face: keep the central part of the facecam, biased upward
+    # (heads sit in the upper half of streamer cams). Owner: "make the face bigger".
+    fw, fh = 1010, 1060
+    framed = crop_on_face(face_src if layout == "stack" else frame, fw / fh)
+    if framed is not None:
+        face_src = framed
+    else:
+        zoom = 1.45
+        zw, zh = face_src.width / zoom, face_src.height / zoom
+        zx = (face_src.width - zw) / 2
+        zy = (face_src.height - zh) * 0.3
+        face_src = face_src.crop((int(zx), int(zy), int(zx + zw), int(zy + zh)))
     canvas = sunset_bg().convert("RGB")
-    canvas = neon_text(canvas, "GTA 6", 300, 250, (255, 255, 255), (0, 240, 255))
-    fw, fh = 900, 820
+    canvas = neon_text(canvas, "GTA 6", 250, 230, (255, 255, 255), (0, 240, 255))
     face = cover(face_src, fw, fh, 0.5, 0.35)
-    fx, fy = (W - fw) // 2, 520
+    fx, fy = (W - fw) // 2, 400
     d = ImageDraw.Draw(canvas)
     for k, col in ((22, (255, 60, 200)), (10, (0, 240, 255))):
         d.rounded_rectangle([fx - k, fy - k, fx + fw + k, fy + fh + k], radius=40, fill=col)
     mask = Image.new("L", (fw, fh), 0)
     ImageDraw.Draw(mask).rounded_rectangle([0, 0, fw, fh], radius=34, fill=255)
     canvas.paste(face, (fx, fy), mask)
-    canvas = draw_hook(canvas, text, 1520)
+    canvas = draw_hook(canvas, text, 1640)
     q = 92
     while True:
         canvas.save(out, "JPEG", quality=q, optimize=True)
