@@ -1,0 +1,53 @@
+{
+ "campaign": "kai",
+ "name": "kai-top5-a",
+ "header": "Top 5 Kai Cenat GTA 6 moments - Day 1",
+ "title": "Kai Cenat's TOP 5 GTA 6 moments from Day 1 😭 #KaiCenat #GTA6",
+ "segments": [
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/d1/3150132383.mp4",
+   "start": 0,
+   "end": 9,
+   "layout": "stack",
+   "cam": "0:430:390:222",
+   "focus": 0.65,
+   "label": "#5 WHAT IS THAT NOISE??"
+  },
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/d1/1948940139.mp4",
+   "start": 6,
+   "end": 15,
+   "layout": "stack",
+   "cam": "0:430:390:222",
+   "focus": 0.65,
+   "label": "#4 STOP PANICKING BRO"
+  },
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/d1/829825827.mp4",
+   "start": 18,
+   "end": 28,
+   "layout": "stack",
+   "cam": "0:430:390:222",
+   "focus": 0.65,
+   "label": "#3 HE GOT BUSTED"
+  },
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/d1/1965176297.mp4",
+   "start": 0,
+   "end": 10,
+   "layout": "stack",
+   "cam": "0:430:390:222",
+   "focus": 0.65,
+   "label": "#2 STRAIGHT INTO THE OCEAN"
+  },
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/d1/774011141.mp4",
+   "start": 16,
+   "end": 26,
+   "layout": "stack",
+   "cam": "0:430:390:222",
+   "focus": 0.65,
+   "label": "#1 THE MOMENT GTA 6 STARTED"
+  }
+ ]
+}

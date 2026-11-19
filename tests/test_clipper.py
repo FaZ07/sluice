@@ -10,6 +10,20 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "clipper"))
 import clip  # noqa: E402
 
 
+class TestCompileSpec(unittest.TestCase):
+    def test_validate_catches_bad_specs(self):
+        import compile as comp
+        good = {"campaign": "kai", "segments": [
+            {"file": "a", "start": 0, "end": 9, "cam": "0:0:10:10", "label": "#2"},
+            {"file": "b", "start": 0, "end": 9, "cam": "0:0:10:10", "label": "#1"}]}
+        self.assertEqual(comp.validate(good), [])
+        self.assertTrue(comp.validate({"campaign": "nope", "segments": []}))
+        long = dict(good, segments=good["segments"] * 4)
+        self.assertTrue(any("total" in p for p in comp.validate(long)))
+        short = dict(good, segments=[dict(good["segments"][0], end=1), good["segments"][1]])
+        self.assertTrue(any("min 3s" in p for p in comp.validate(short)))
+
+
 class TestTimestamps(unittest.TestCase):
     def test_parse_forms(self):
         self.assertEqual(clip.parse_ts("75"), 75.0)
@@ -69,7 +83,9 @@ class TestCaptions(unittest.TestCase):
                  (0.9, 1.2, " bitch"), (1.2, 1.5, " retarded"), (1.5, 1.8, " night")]
         out, mutes = clip.censor_words(words)
         self.assertEqual([w for _, _, w in out],
-                         [" what", " ****", " ****,", " bitch", " ****", " night"])
+                         [" what", " n****", " n*****,", " bitch", " r*******", " night"])
+        self.assertEqual(mutes, [])                    # default: voice untouched
+        _, mutes = clip.censor_words(words, beep=True)
         self.assertEqual(len(mutes), 3)
         self.assertIn("between(t,0.25,0.65)", clip.mute_filter(mutes))
         self.assertIsNone(clip.mute_filter([]))
@@ -223,6 +239,20 @@ class TestRenderReal(unittest.TestCase):
         subprocess.run([clip.tool("ffmpeg"), "-y", "-v", "error", "-i", self.src_full,
                         "-af", "volume=0", "-c:v", "copy", quiet], check=True)
         self.assertLess(clip.max_volume_db(quiet), clip.SILENT_DB)
+
+    def test_compilation_two_segments(self):
+        import compile as comp
+        spec = {"campaign": "kai", "name": "t-comp", "title": "t", "header": "Top 2 test",
+                "segments": [
+                    {"file": self.src_full, "start": 0, "end": 4, "cam": "1400:0:520:300",
+                     "focus": 0.35, "label": "#2 FIRST"},
+                    {"file": self.src_full, "start": 5, "end": 9, "cam": "1400:0:520:300",
+                     "label": "#1 SECOND"}]}
+        out, info = comp.build(spec, out_dir=self.td, transcribe=lambda p: [])
+        self.assertEqual((info["w"], info["h"]), (1080, 1920))
+        self.assertAlmostEqual(info["dur"], 8.0, delta=0.4)
+        self.assertTrue(info["audio"])
+        self.assertTrue(os.path.exists(os.path.join(self.td, "t-comp.txt")))
 
     def test_center_no_subs(self):
         src = self._cut("center")

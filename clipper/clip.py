@@ -226,13 +226,23 @@ def chunk_words(words, max_words=3, max_chars=18, max_gap=0.6,
 CENSOR_RX = re.compile(r"\bn+i+g+[aeh]*r*s*z*\b|\bfag+(ot)?s?\b|\bretard(ed|s)?\b", re.I)
 
 
-def censor_words(words):
-    """-> (words with slurs starred, [(start, end)] spans to mute)."""
+def _star(m):
+    word = m.group(0)
+    return word[0] + "*" * max(3, len(word) - 1)
+
+
+def censor_words(words, beep=False):
+    """-> (words with slurs starred as 'N****', [(start, end)] spans to bleep).
+
+    Owner's call (2026-11-20): keep the streamer's voice as-is and censor only
+    the captions; spans are returned only when beep=True.
+    """
     out, mutes = [], []
     for s, e, w in words:
         if CENSOR_RX.search(w):
-            mutes.append((max(0.0, s - 0.05), e + 0.05))
-            w = CENSOR_RX.sub("****", w)
+            if beep:
+                mutes.append((max(0.0, s - 0.05), e + 0.05))
+            w = CENSOR_RX.sub(_star, w)
         out.append((s, e, w))
     return out, mutes
 
@@ -586,6 +596,8 @@ def main(argv=None):
     ap.add_argument("--phrase-captions", action="store_true",
                     help="2-3 word captions instead of the default one-word pop")
     ap.add_argument("--no-sfx", action="store_true", help="skip whoosh/ding")
+    ap.add_argument("--beep", action="store_true",
+                    help="bleep slurs in the audio (default: captions-only censor)")
     ap.add_argument("--no-downloads-copy", action="store_true")
     a = ap.parse_args(argv)
 
@@ -632,7 +644,7 @@ def main(argv=None):
             if words is None:
                 print("WARN: faster-whisper not installed -> no captions")
             else:
-                words, mutes = censor_words(words)
+                words, mutes = censor_words(words, beep=a.beep)
                 events = chunk_words(words, max_words=3 if a.phrase_captions else 1)
                 print("      %d words -> %d caption events, %d slur(s) muted"
                       % (len(words), len(events), len(mutes)))

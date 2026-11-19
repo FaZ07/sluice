@@ -1,0 +1,53 @@
+{
+ "campaign": "kai",
+ "name": "kai-top5-c",
+ "header": "Kai Cenat's funniest GTA 6 moments",
+ "title": "Kai Cenat's FUNNIEST GTA 6 moments 💀 #KaiCenat #GTA6",
+ "segments": [
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/d1/1075627219.mp4",
+   "start": 14,
+   "end": 23,
+   "layout": "stack",
+   "cam": "0:430:390:222",
+   "focus": 0.65,
+   "label": "#5 HE'S TOO FULL"
+  },
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/d2/46492098.mp4",
+   "start": 18,
+   "end": 28,
+   "layout": "stack",
+   "cam": "0:430:390:222",
+   "focus": 0.65,
+   "label": "#4 CHAT, GIVE ME ADVICE"
+  },
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/d1/3907402066.mp4",
+   "start": 0,
+   "end": 9,
+   "layout": "stack",
+   "cam": "0:430:390:222",
+   "focus": 0.65,
+   "label": "#3 LISTEN, I CAN EXPLAIN"
+  },
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/buck.mp4",
+   "start": 20,
+   "end": 30,
+   "layout": "stack",
+   "cam": "0:430:390:222",
+   "focus": 0.65,
+   "label": "#2 THE BANK SAID NO"
+  },
+  {
+   "file": "C:/Users/moham/AppData/Local/Temp/kai/gtavi.mp4",
+   "start": 24,
+   "end": 35.5,
+   "layout": "stack",
+   "cam": "0:715:430:255",
+   "focus": 0.5,
+   "label": "#1 HE MET LUCIA"
+  }
+ ]
+}
