@@ -94,6 +94,74 @@ def draw_hook(img, text, cy):
     return img
 
 
+def sunset_bg():
+    """Vice-City-style sunset (our own art, same as the ClippersFc banner).
+
+    Deliberately no Rockstar/GTA logo: Kai's campaign bans logos of any kind
+    and Dom's bans Rockstar art.
+    """
+    import branding
+    base = branding.gradient(W, H)
+    img = base.copy()
+    d = ImageDraw.Draw(img)
+    cx, cy, r = W // 2, 760, 330
+    branding.sun(d, cx, cy, r)
+    branding.stripe_cut(img, cx, cy, r, base)
+    d = ImageDraw.Draw(img)
+    for i in range(-14, 15):
+        d.line([(cx + i * 30, 1120), (cx + i * 220, H)], fill=(255, 90, 200), width=3)
+    for k in range(9):
+        y = 1120 + int((k / 8) ** 1.8 * (H - 1120))
+        d.line([(0, y), (W, y)], fill=(255, 90, 200), width=3)
+    return img
+
+
+def neon_text(img, text, cy, size, fill, glow):
+    layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    gd = ImageDraw.Draw(layer)
+    font = ImageFont.truetype(FONT, size)
+    gd.text((W // 2, cy), text, font=font, fill=glow + (255,), anchor="mm",
+            stroke_width=size // 10, stroke_fill=glow + (255,))
+    blur = layer.filter(ImageFilter.GaussianBlur(size // 8))
+    img.paste(blur, (0, 0), blur)
+    d = ImageDraw.Draw(img)
+    d.text((W // 2, cy), text, font=font, fill=fill, anchor="mm",
+           stroke_width=max(6, size // 18), stroke_fill=(20, 0, 40))
+    return img
+
+
+def make_sunset(src, out, text, t=None, layout="stack", cam=None, focus=0.5):
+    """Sunset background + framed reaction face + neon 'GTA 6' + hook."""
+    if t is None:
+        t = loudest_time(src)
+    with tempfile.TemporaryDirectory() as td:
+        frame = grab(src, t, os.path.join(td, "f.png"))
+    if layout == "stack":
+        x, y, cw, ch = cam
+        face_src = frame.crop((x, y, x + cw, y + ch))
+    else:
+        face_src = cover(frame, int(frame.height * 0.75), frame.height, focus, 0.5)
+    canvas = sunset_bg().convert("RGB")
+    canvas = neon_text(canvas, "GTA 6", 300, 250, (255, 255, 255), (0, 240, 255))
+    fw, fh = 900, 820
+    face = cover(face_src, fw, fh, 0.5, 0.35)
+    fx, fy = (W - fw) // 2, 520
+    d = ImageDraw.Draw(canvas)
+    for k, col in ((22, (255, 60, 200)), (10, (0, 240, 255))):
+        d.rounded_rectangle([fx - k, fy - k, fx + fw + k, fy + fh + k], radius=40, fill=col)
+    mask = Image.new("L", (fw, fh), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, fw, fh], radius=34, fill=255)
+    canvas.paste(face, (fx, fy), mask)
+    canvas = draw_hook(canvas, text, 1520)
+    q = 92
+    while True:
+        canvas.save(out, "JPEG", quality=q, optimize=True)
+        if os.path.getsize(out) < 1_900_000 or q <= 60:
+            break
+        q -= 8
+    return out, t
+
+
 def make(src, out, text, t=None, layout="stack", cam=None, focus=0.5):
     if t is None:
         t = loudest_time(src)
@@ -132,11 +200,13 @@ def main(argv=None):
     ap.add_argument("--layout", default="stack", choices=["stack", "center"])
     ap.add_argument("--cam")
     ap.add_argument("--focus", type=float, default=0.5)
+    ap.add_argument("--style", default="sunset", choices=["sunset", "split"])
     a = ap.parse_args(argv)
     cam = clip.parse_cam(a.cam) if a.cam else None
     if a.layout == "stack" and not cam:
         ap.error("stack needs --cam")
-    out, t = make(a.src, a.out, a.text, a.t, a.layout, cam, a.focus)
+    fn = make_sunset if a.style == "sunset" else make
+    out, t = fn(a.src, a.out, a.text, a.t, a.layout, cam, a.focus)
     print("thumb: %s (frame @ %.2fs, %d KB)" % (out, t, os.path.getsize(out) // 1024))
     return 0
 
