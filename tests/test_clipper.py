@@ -216,6 +216,14 @@ class TestRenderReal(unittest.TestCase):
         self.assertAlmostEqual(info["dur"], 8.0, delta=0.3)
         self.assertTrue(info["audio"])
 
+    def test_silent_source_detected(self):
+        loud = clip.max_volume_db(self.src_full)
+        self.assertGreater(loud, clip.SILENT_DB)
+        quiet = os.path.join(self.td, "muted.mp4")
+        subprocess.run([clip.tool("ffmpeg"), "-y", "-v", "error", "-i", self.src_full,
+                        "-af", "volume=0", "-c:v", "copy", quiet], check=True)
+        self.assertLess(clip.max_volume_db(quiet), clip.SILENT_DB)
+
     def test_center_no_subs(self):
         src = self._cut("center")
         out = os.path.join(self.td, "center.mp4")

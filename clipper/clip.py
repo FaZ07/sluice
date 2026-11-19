@@ -466,6 +466,20 @@ def probe(path):
             "audio": any(s.get("codec_type") == "audio" for s in data["streams"])}
 
 
+SILENT_DB = -60.0   # Twitch DMCA-muted clips measure about -91 dB
+
+
+def max_volume_db(path):
+    """Peak level of the audio track in dBFS, or None if there is no audio."""
+    proc = subprocess.run([tool("ffmpeg"), "-v", "info", "-i", path, "-vn",
+                           "-af", "volumedetect", "-f", "null", "-"],
+                          capture_output=True, text=True, encoding="utf-8", errors="replace")
+    m = re.search(r"max_volume:\s*(-?[0-9.]+|-inf)\s*dB", proc.stderr)
+    if not m:
+        return None
+    return -200.0 if m.group(1) == "-inf" else float(m.group(1))
+
+
 def download_section(url, start, end, dest_dir):
     ytdlp = tool("yt-dlp")
     if not ytdlp:
@@ -602,6 +616,12 @@ def main(argv=None):
             clip = download_section(a.url, start, end, work)
         else:
             clip = cut_local(a.file, start, end, work)
+        peak = max_volume_db(clip)
+        if peak is None or peak < SILENT_DB:
+            print("ERROR: source audio is silent/muted (peak %s dB) - Twitch mutes clips "
+                  "with copyrighted music. Pick another source or cut it from the VOD."
+                  % ("none" if peak is None else "%.0f" % peak))
+            return 3
         events, mutes = [], []
         if not a.no_captions:
             print("[2/4] transcribing (whisper %s, cpu)..." % WHISPER_MODEL)
