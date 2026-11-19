@@ -127,5 +127,5 @@ saved as `clipper/assets/kreekcraft_overlay.png` first.
 
 Honest limits: not yet run on a real stream download (only a local synthetic
 test video with TTS speech); `--url` on a still-live stream may fail -- use
-the VOD or a local recording. Tests: 19 in `tests/test_clipper.py`, three of
-them real ffmpeg renders.
+the VOD or a local recording. Tests: 20 in `tests/test_clipper.py`, three of
+them real ffmpeg renders. Read `clipper/VIRAL_NOTES.md` before a clipping session.

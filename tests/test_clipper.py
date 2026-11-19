@@ -31,6 +31,12 @@ class TestTimestamps(unittest.TestCase):
         self.assertIn("after", clip.check_duration(40, 10, 60)[0])
         self.assertIn("under 7s", clip.check_duration(0, 5, 60)[0])
         self.assertIn("at or under 60s", clip.check_duration(0, 75, 60)[0])
+        self.assertIn("18-45s", clip.check_duration(0, 10, 60)[0])
+        self.assertIn("18-45s", clip.check_duration(0, 55, 60)[0])
+
+    def test_captions_stay_above_bottom_third(self):
+        for lay in ("fit", "center", "stack"):
+            self.assertLess(clip.caption_y(lay), clip.H * 2 // 3)
 
 
 class TestCaptions(unittest.TestCase):

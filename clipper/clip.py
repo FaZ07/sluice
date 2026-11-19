@@ -142,8 +142,12 @@ def fmt_ass_time(sec):
     return "%d:%02d:%02d.%02d" % (h, m, s, cs)
 
 
-def check_duration(start, end, max_secs):
-    """Return a list of problems (empty == fine)."""
+def check_duration(start, end, max_secs, sweet=(18, 45)):
+    """Return a list of problems (empty == fine).
+
+    sweet: the 18-45 s band repeated across clipping guides for streamer
+    moments (VIRAL_NOTES.md section 2). Outside it is a warning, not an error.
+    """
     probs = []
     dur = end - start
     if dur <= 0:
@@ -152,6 +156,9 @@ def check_duration(start, end, max_secs):
         probs.append("clip is %.1fs; most campaigns reject under 7s" % dur)
     elif dur > max_secs:
         probs.append("clip is %.1fs; keep it at or under %ds" % (dur, max_secs))
+    elif not sweet[0] <= dur <= sweet[1]:
+        probs.append("clip is %.1fs; streamer clips do best at %d-%ds"
+                     % (dur, sweet[0], sweet[1]))
     return probs
 
 
@@ -202,8 +209,12 @@ def ass_escape(text):
 
 
 def caption_y(layout):
-    """Vertical position (px from top) for the spoken captions."""
-    return {"fit": 1420, "center": 1380, "stack": 1450}[layout]
+    """Vertical position (px from top) for the spoken captions.
+
+    Kept ABOVE the bottom third (y < 1280): the Shorts title, channel name and
+    buttons cover that band on a phone (VIRAL_NOTES.md section 2).
+    """
+    return {"fit": 1180, "center": 1150, "stack": 1150}[layout]
 
 
 def build_ass(events, layout="fit", hook=None, hook_secs=3.0, clip_secs=None):
@@ -287,6 +298,17 @@ def build_filter(layout, cam=None, overlay_kind=None, subs=True):
     tail = "subtitles=subs.ass," if subs else ""
     g += ";[%s]%sfps=%d,format=yuv420p[vout]" % (last, tail, FPS)
     return g
+
+
+# Apply to every campaign (VIRAL_NOTES.md, top rules).
+COMMON_RULES = [
+    "Opens on the payoff/reaction, not the setup; hook text asks a question",
+    "No GTA radio music in the clip (Content ID claims)",
+    "No story spoilers or cutscenes (Rockstar takedowns)",
+    "English title with streamer name + topic, e.g. 'Dylan Page GTA 6 police chase'",
+    "Post in US evening hours (early morning IST)",
+    "Submit the post link within 30 minutes, to ONE campaign only",
+]
 
 
 def post_caption(campaign, title):
@@ -488,7 +510,7 @@ def main(argv=None):
         shutil.copy2(out_txt, os.path.join(DOWNLOADS, name + ".txt"))
         print("      copied to Downloads\\%s.mp4 + .txt" % name)
     print("CHECKLIST (%s):" % c["name"])
-    for r in c["rules"]:
+    for r in c["rules"] + COMMON_RULES:
         print("  [ ] " + r)
     return 0
 
