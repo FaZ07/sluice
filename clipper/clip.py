@@ -95,6 +95,21 @@ CAMPAIGNS = {
             "Skip explicit jokes that break platform rules",
         ],
     },
+    "kai": {
+        "name": "Kai Cenat - $10,000 GTA 6 Pool Campaign",
+        "rate": "pool: $10K split by views; need 750K total approved views; each clip 1K+ views",
+        "source": "Kai's GTA 6 marathon (from 2026-11-18) on Twitch/YouTube: streams, VODs, clips",
+        "tag_block": ["Kai Cenat GTA 6 marathon moments. Watch Kai live on Twitch: twitch.tv/kaicenat",
+                      "#KaiCenat #GTA6 #KaiCenatGTA6"],
+        "overlay": None,
+        "max_secs": 60,
+        "rules": [
+            "Kai must be the MAIN focus for the whole edit (not just the intro)",
+            "Name 'Kai Cenat' in the title or on-screen text; caption has #KaiCenat",
+            "NO logos of any kind; never show Kai in a negative light / no hate-farming",
+            "No reposts, collab posts, botting",
+        ],
+    },
     "kreek": {
         "name": "KreekCraft GTA 6 Clipping",
         "rate": "$1 / 1K views, min $3 (3K views), max $300/clip",
