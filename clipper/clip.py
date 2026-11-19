@@ -38,6 +38,13 @@ DOWNLOADS = os.path.join(os.path.expanduser("~"), "Downloads")
 
 W, H = 1080, 1920
 FPS = 30
+# Upload quality: YouTube recommends ~8 Mbps for 1080p30; low-bitrate uploads
+# come out looking 480p after YouTube's own re-encode (owner noticed).
+QUALITY = ["-preset", "medium", "-crf", "16", "-maxrate", "12M", "-bufsize", "24M",
+           "-profile:v", "high"]
+SAFE_TOP = 200      # covered by Dynamic Island / status bar / Shorts top icons
+CAM_H = 640         # facecam panel height in the stack layout
+HEADER_Y = 150      # always-on header line, inside the dark safe band
 WHISPER_MODEL = "small"   # cached locally; "base" is faster, worse
 
 _FFMPEG_FALLBACK = (r"C:\Users\moham\AppData\Local\Microsoft\WinGet\Packages"
@@ -343,7 +350,7 @@ def build_ass(events, layout="fit", hook=None, hook_secs=3.0, clip_secs=None,
     if hook:
         end = clip_secs if (hook_secs is None and clip_secs) else (hook_secs or 3.0)
         # stack: sit on the seam between facecam and gameplay, not on a face
-        hook_y = 640 if layout == "stack" else 330
+        hook_y = SAFE_TOP + CAM_H if layout == "stack" else 330
         lines.append("Dialogue: 1,%s,%s,Hook,,0,0,0,,{\\pos(%d,%d)}%s" % (
             fmt_ass_time(0), fmt_ass_time(end), W // 2, hook_y, ass_escape(hook)))
     if credit and clip_secs:
@@ -396,13 +403,17 @@ def build_filter(layout, cam=None, overlay_kind=None, subs=True, focus=0.5):
         if not cam:
             raise ValueError("stack layout needs --cam x:y:w:h (facecam box)")
         x, y, cw, ch = cam
-        top_h = 640
+        # Phone safe band: the top SAFE_TOP px sit under the Dynamic Island /
+        # status bar / Shorts icons, so nothing important goes there.
+        top_h = CAM_H
+        game_h = H - SAFE_TOP - top_h
         g = ("[0:v]split[a][b];"
              "[a]crop=%d:%d:%d:%d,scale=%d:%d:force_original_aspect_ratio=increase,"
              "crop=%d:%d[cam];"
              "[b]scale=-2:%d,crop=%d:%d:%s:0[game];"
-             "[cam][game]vstack[v0]" % (cw, ch, x, y, W, top_h, W, top_h,
-                                         H - top_h, W, H - top_h, fx))
+             "[cam][game]vstack,pad=%d:%d:0:%d:color=0x0d0d12[v0]"
+             % (cw, ch, x, y, W, top_h, W, top_h, game_h, W, game_h, fx,
+                W, H, SAFE_TOP))
     else:
         raise ValueError("layout must be fit, center or stack")
     last = "v0"
@@ -511,7 +522,7 @@ def cut_local(path, start, end, dest_dir):
     dst = os.path.join(dest_dir, "src.mp4")
     run([tool("ffmpeg"), "-y", "-v", "error", "-ss", "%.3f" % start, "-i", path,
          "-t", "%.3f" % (end - start), "-c:v", "libx264", "-preset", "veryfast",
-         "-crf", "18", "-c:a", "aac", "-b:a", "192k", dst])
+         "-crf", "14", "-c:a", "aac", "-b:a", "192k", dst])   # near-lossless intermediate
     return dst
 
 
@@ -555,7 +566,7 @@ def render(src, out_path, layout, events, hook=None, hook_secs=3.0,
         cmd += ["-map", "[aout]" if agraph else "0:a:0", "-c:a", "aac", "-b:a", "160k"]
     # -map_metadata -1 / -fflags +bitexact: drop source + tool metadata
     # (encoder tags, creation time) so uploads carry no editing fingerprints.
-    cmd += ["-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+    cmd += ["-c:v", "libx264"] + QUALITY + [
             "-map_metadata", "-1", "-fflags", "+bitexact",
             "-movflags", "+faststart", "-shortest", "-t", "%.3f" % info["dur"],
             os.path.abspath(out_path)]

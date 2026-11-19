@@ -146,6 +146,13 @@ class TestFilterAndCampaigns(unittest.TestCase):
         with self.assertRaises(ValueError):
             clip.build_filter("center", focus=1.5)
 
+    def test_stack_keeps_phone_safe_band(self):
+        g = clip.build_filter("stack", cam=(0, 0, 10, 10))
+        self.assertIn("pad=1080:1920:0:%d" % clip.SAFE_TOP, g)
+        self.assertGreaterEqual(clip.SAFE_TOP, 150)
+        a = clip.build_ass([], "stack", hook="X", hook_secs=3.0)
+        self.assertIn("\\pos(540,%d)}X" % (clip.SAFE_TOP + clip.CAM_H), a)
+
     def test_stack_needs_cam(self):
         with self.assertRaises(ValueError):
             clip.build_filter("stack")

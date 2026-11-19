@@ -72,7 +72,7 @@ def header_ass(text, secs):
     """ASS with one always-on header line at the very top of the frame."""
     base = clip.build_ass([], "stack", clip_secs=secs)
     line = "Dialogue: 4,%s,%s,Credit,,0,0,0,,{\\pos(%d,%d)}%s" % (
-        clip.fmt_ass_time(0), clip.fmt_ass_time(secs), clip.W // 2, 44,
+        clip.fmt_ass_time(0), clip.fmt_ass_time(secs), clip.W // 2, clip.HEADER_Y,
         clip.ass_escape(text).upper())
     return base + line + "\n"
 
@@ -89,7 +89,7 @@ def concat(parts, out_path, work, header=None):
             f.write(header_ass(header, total))
         vf = ["-vf", "subtitles=header.ass"]
     clip.run([clip.tool("ffmpeg"), "-y", "-v", "error", "-f", "concat", "-safe", "0",
-              "-i", lst] + vf + ["-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+              "-i", lst] + vf + ["-c:v", "libx264"] + clip.QUALITY + [
               "-r", str(clip.FPS), "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k",
               "-ar", "48000", "-ac", "2", "-map_metadata", "-1", "-fflags", "+bitexact",
               "-movflags", "+faststart", os.path.abspath(out_path)], cwd=work)
