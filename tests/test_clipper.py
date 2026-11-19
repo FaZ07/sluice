@@ -261,6 +261,21 @@ class TestRenderReal(unittest.TestCase):
         self.assertTrue(info["audio"])
         self.assertTrue(os.path.exists(os.path.join(self.td, "t-comp.txt")))
 
+    def test_thumbnail_stack_and_center(self):
+        import thumb
+        out = os.path.join(self.td, "th.jpg")
+        _, t = thumb.make(self.src_full, out, "HE GOT BUSTED", layout="stack",
+                          cam=(1400, 0, 520, 300), focus=0.35)
+        from PIL import Image
+        im = Image.open(out)
+        self.assertEqual(im.size, (1080, 1920))
+        self.assertLess(os.path.getsize(out), 2_000_000)
+        self.assertGreaterEqual(t, 0.0)
+        out2 = os.path.join(self.td, "th2.jpg")
+        thumb.make(self.src_full, out2, "A VERY LONG HOOK THAT MUST WRAP", t=2.0,
+                   layout="center", focus=0.4)
+        self.assertEqual(Image.open(out2).size, (1080, 1920))
+
     def test_center_no_subs(self):
         src = self._cut("center")
         out = os.path.join(self.td, "center.mp4")
