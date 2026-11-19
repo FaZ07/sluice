@@ -276,6 +276,15 @@ class TestRenderReal(unittest.TestCase):
                    layout="center", focus=0.4)
         self.assertEqual(Image.open(out2).size, (1080, 1920))
 
+    def test_cold_open_prepends_payoff(self):
+        d = os.path.join(self.td, "cold")
+        os.makedirs(d)
+        src = self._cut("coldsrc")
+        out = clip.cold_open(src, 5.0, 1.6, d)
+        info = clip.probe(out)
+        self.assertAlmostEqual(info["dur"], 8.0 + 1.6, delta=0.3)
+        self.assertTrue(info["audio"])
+
     def test_center_no_subs(self):
         src = self._cut("center")
         out = os.path.join(self.td, "center.mp4")

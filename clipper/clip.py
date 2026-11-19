@@ -526,6 +526,22 @@ def cut_local(path, start, end, dest_dir):
     return dst
 
 
+def cold_open(src, at, dur, dest_dir):
+    """Prepend `dur` s of the payoff (starting `at` s into src) before the clip.
+
+    'Open on the payoff, then rewind' - the strongest first-second hook.
+    """
+    dst = os.path.join(dest_dir, "cold.mp4")
+    g = ("[0:v]trim=start=%.3f:duration=%.3f,setpts=PTS-STARTPTS[v1];"
+         "[0:a]atrim=start=%.3f:duration=%.3f,asetpts=PTS-STARTPTS[a1];"
+         "[0:v]setpts=PTS-STARTPTS[v2];[0:a]asetpts=PTS-STARTPTS[a2];"
+         "[v1][a1][v2][a2]concat=n=2:v=1:a=1[v][a]" % (at, dur, at, dur))
+    run([tool("ffmpeg"), "-y", "-v", "error", "-i", src, "-filter_complex", g,
+         "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "veryfast",
+         "-crf", "14", "-c:a", "aac", "-b:a", "192k", dst])
+    return dst
+
+
 def transcribe(path):
     """[(start, end, word)] or None if faster-whisper is unavailable."""
     try:
@@ -607,6 +623,8 @@ def main(argv=None):
     ap.add_argument("--phrase-captions", action="store_true",
                     help="2-3 word captions instead of the default one-word pop")
     ap.add_argument("--no-sfx", action="store_true", help="skip whoosh/ding")
+    ap.add_argument("--cold-open", type=float, metavar="SECS",
+                    help="open on 1.6 s of the payoff found SECS into the clip, then rewind")
     ap.add_argument("--beep", action="store_true",
                     help="bleep slurs in the audio (default: captions-only censor)")
     ap.add_argument("--no-downloads-copy", action="store_true")
@@ -642,6 +660,8 @@ def main(argv=None):
             clip = download_section(a.url, start, end, work)
         else:
             clip = cut_local(a.file, start, end, work)
+        if a.cold_open is not None:
+            clip = cold_open(clip, a.cold_open, 1.6, work)
         peak = max_volume_db(clip)
         if peak is None or peak < SILENT_DB:
             print("ERROR: source audio is silent/muted (peak %s dB) - Twitch mutes clips "
