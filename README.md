@@ -108,3 +108,24 @@ sluice.py   → CLI: run one job / demo all
 ## Stack
 
 Python 3 stdlib · Anakin Wire (data) · nothing else to install.
+
+## clipper/ -- campaign clip builder (added 2026-11-19)
+
+Vertical 1080x1920 clips for Content Rewards clipping campaigns (GTA 6:
+Dylan Page, Dasgasd3m, KreekCraft). You pick the moment; the tool downloads
+only that section, makes it vertical, burns English captions (local
+faster-whisper, optional), adds the required overlay/hook, and writes the
+paste-ready post caption with each campaign's required tags.
+
+    python clipper/clip.py --list
+    python clipper/clip.py dylan --url <vod-url> --start 1:02:10 --end 1:02:45 --title "..." --hook "HE DID WHAT"
+    python clipper/clip.py dom --file rec.mp4 --start 10:05 --end 10:40 --layout stack --cam 1500:20:400:300
+
+Layouts: `fit` (whole frame over blurred fill, default), `center` (crop),
+`stack` (facecam box on top, gameplay below). KreekCraft needs its overlay
+saved as `clipper/assets/kreekcraft_overlay.png` first.
+
+Honest limits: not yet run on a real stream download (only a local synthetic
+test video with TTS speech); `--url` on a still-live stream may fail -- use
+the VOD or a local recording. Tests: 19 in `tests/test_clipper.py`, three of
+them real ffmpeg renders.

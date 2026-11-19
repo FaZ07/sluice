@@ -6,3 +6,7 @@ deliverables/
 
 __pycache__/
 *.pyc
+
+# clipper: rendered clips and campaign-owned overlay images stay local
+clipper/out/
+clipper/assets/
