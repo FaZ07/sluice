@@ -127,7 +127,7 @@ saved as `clipper/assets/kreekcraft_overlay.png` first.
 
 Honest limits: not yet run on a real stream download (only a local synthetic
 test video with TTS speech); `--url` on a still-live stream may fail -- use
-the VOD or a local recording. Tests: 21 in `tests/test_clipper.py`, three of
+the VOD or a local recording. Tests: 26 in `tests/test_clipper.py`, three of
 them real ffmpeg renders. Read `clipper/VIRAL_NOTES.md` before a clipping session.
 
 `clipper/ytrange.py` pulls an exact time window from a finished 10+ GB
@@ -135,3 +135,10 @@ YouTube livestream VOD by reading its sidx index and HTTP-ranging only those
 bytes (yt-dlp/ffmpeg section downloads stall on files that size): 35 s of
 1080p60 in ~16 s. Facecam-inset streams: `--layout stack --cam x:y:w:h
 --focus 0.35` keeps the inset out of the gameplay panel.
+
+Style (2026-11-19): one-word yellow pop captions by default (`--phrase-captions`
+for 2-3 words), slurs auto-detected from the transcript -> muted + 1 kHz bleep
++ `****` in captions, synthesised whoosh under the hook and ding on the end
+card (`--no-sfx` to skip), per-campaign on-screen credit/end card (Dom:
+"dasgasd3m on Kick" / kick.com/dasgasd3m). `clipper/branding.py` regenerates
+the ClippersFc profile picture and banner (no Rockstar marks).

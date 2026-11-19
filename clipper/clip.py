@@ -80,11 +80,14 @@ CAMPAIGNS = {
         "name": "Dasgasd3m x RUCKUS | GTA 6",
         "rate": "$2 / 1K views, min $10 (5K views), max $150/clip; deadline 2026-12-19",
         "source": "Dom's Kick GTA 6 streams from 2026-11-18 on (kick.com/dasgasd3m)",
-        "tag_block": ["Watch Dom live: kick.com/dasgasd3m",
-                      "#dasgasdom3 #GTA6 #dasgasd3m"],
+        "tag_block": ["Credit: dasgasd3m on Kick - watch Dom live at kick.com/dasgasd3m",
+                      "#dasgasdom3 #GTA6 #GTA6Clips"],
+        "credit": "dasgasd3m on Kick",
+        "endcard": "WATCH DOM LIVE: kick.com/dasgasd3m",
         "overlay": None,
         "max_secs": 60,
         "rules": [
+            "Paid from 10K views on ONE post (posts don't combine), $2/1K, cap $150",
             "Post ONLY on the GTA-6-specific channel",
             "Keep Dom's face or voice; keep setup + reaction + payoff",
             "SUBMIT THE POST LINK WITHIN 30 MINUTES OF POSTING",
@@ -203,6 +206,69 @@ def chunk_words(words, max_words=3, max_chars=18, max_gap=0.6,
     return fixed
 
 
+# Slurs get muted in the audio and starred in captions. Brief (RUCKUS/Dom):
+# "cut, mute or blur where appropriate"; YouTube limits Shorts that use them.
+CENSOR_RX = re.compile(r"\bn+i+g+[aeh]*r*s*z*\b|\bfag+(ot)?s?\b|\bretard(ed|s)?\b", re.I)
+
+
+def censor_words(words):
+    """-> (words with slurs starred, [(start, end)] spans to mute)."""
+    out, mutes = [], []
+    for s, e, w in words:
+        if CENSOR_RX.search(w):
+            mutes.append((max(0.0, s - 0.05), e + 0.05))
+            w = CENSOR_RX.sub("****", w)
+        out.append((s, e, w))
+    return out, mutes
+
+
+def mute_filter(mutes):
+    """ffmpeg -af expression silencing each span, or None."""
+    if not mutes:
+        return None
+    cond = "+".join("between(t,%.2f,%.2f)" % (a, b) for a, b in mutes)
+    return "volume=enable='%s':volume=0" % cond
+
+
+_AFMT = "aformat=sample_rates=48000:channel_layouts=stereo"
+
+
+def build_audio(dur, mutes=None, sfx=True, endcard=False):
+    """Audio part of -filter_complex -> '[aout]', or None if nothing to do.
+
+    - slurs: original muted + a 1 kHz bleep over the same span (TV style)
+    - sfx (synthesised, no downloads): whoosh under the hook, ding at the end card
+    """
+    mutes = mutes or []
+    if not mutes and not sfx:
+        return None
+    parts, ins = [], []
+    base = "[0:a]%s" % _AFMT
+    if mutes:
+        base += "," + mute_filter(mutes)
+    parts.append(base + "[a0]")
+    ins.append("[a0]")
+    if mutes:
+        cond = "+".join("between(t,%.2f,%.2f)" % (a, b) for a, b in mutes)
+        parts.append("sine=frequency=1000:sample_rate=48000:duration=%.2f,"
+                     "volume='0.22*(%s)':eval=frame,%s[bp]" % (dur, cond, _AFMT))
+        ins.append("[bp]")
+    if sfx:
+        parts.append("anoisesrc=duration=0.7:color=pink:sample_rate=48000:amplitude=0.5,"
+                     "highpass=f=500,lowpass=f=6000,afade=t=in:d=0.35,"
+                     "afade=t=out:st=0.35:d=0.35,volume=0.6,%s[wh]" % _AFMT)
+        ins.append("[wh]")
+        if endcard and dur > 3.5:
+            ms = int((dur - 3.0) * 1000)
+            parts.append("sine=frequency=1320:sample_rate=48000:duration=0.5,"
+                         "afade=t=out:d=0.5,volume=0.3,adelay=%d|%d,%s[dg]"
+                         % (ms, ms, _AFMT))
+            ins.append("[dg]")
+    parts.append("%samix=inputs=%d:normalize=0:duration=first[aout]"
+                 % ("".join(ins), len(ins)))
+    return ";".join(parts)
+
+
 def ass_escape(text):
     return (text.replace("\\", "/").replace("{", "(").replace("}", ")")
             .replace("\n", " ").strip())
@@ -217,7 +283,8 @@ def caption_y(layout):
     return {"fit": 1180, "center": 1150, "stack": 1150}[layout]
 
 
-def build_ass(events, layout="fit", hook=None, hook_secs=3.0, clip_secs=None):
+def build_ass(events, layout="fit", hook=None, hook_secs=3.0, clip_secs=None,
+              credit=None, endcard=None, word_mode=False):
     """Full ASS subtitle file text. Deterministic for identical input."""
     y = caption_y(layout)
     lines = [
@@ -238,6 +305,12 @@ def build_ass(events, layout="fit", hook=None, hook_secs=3.0, clip_secs=None):
         # hook: black text on white box, top
         "Style: Hook,Arial,64,&H00000000,&H00000000,&H00FFFFFF,&H00FFFFFF,"
         "-1,0,0,0,100,100,0,0,3,18,0,5,80,80,0,1",
+        # word-by-word: one big yellow word that pops in
+        "Style: Word,Arial,112,&H0000E6FF,&H0000E6FF,&H00000000,&H64000000,"
+        "-1,0,0,0,100,100,0,0,1,8,3,5,60,60,0,1",
+        # streamer credit: small, always on, readable on a phone
+        "Style: Credit,Arial,46,&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,"
+        "-1,0,0,0,100,100,0,0,3,10,0,5,40,40,0,1",
         "",
         "[Events]",
         "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text",
@@ -248,9 +321,22 @@ def build_ass(events, layout="fit", hook=None, hook_secs=3.0, clip_secs=None):
         hook_y = 640 if layout == "stack" else 330
         lines.append("Dialogue: 1,%s,%s,Hook,,0,0,0,,{\\pos(%d,%d)}%s" % (
             fmt_ass_time(0), fmt_ass_time(end), W // 2, hook_y, ass_escape(hook)))
+    if credit and clip_secs:
+        lines.append("Dialogue: 2,%s,%s,Credit,,0,0,0,,{\\pos(%d,%d)}%s" % (
+            fmt_ass_time(0), fmt_ass_time(clip_secs), W // 2, 1290, ass_escape(credit)))
+    if endcard and clip_secs:
+        lines.append("Dialogue: 3,%s,%s,Hook,,0,0,0,,{\\pos(%d,%d)}%s" % (
+            fmt_ass_time(max(0.0, clip_secs - 3.0)), fmt_ass_time(clip_secs),
+            W // 2, 960, ass_escape(endcard)))
     for s, e, t in events:
-        lines.append("Dialogue: 0,%s,%s,Cap,,0,0,0,,{\\pos(%d,%d)}%s" % (
-            fmt_ass_time(s), fmt_ass_time(e), W // 2, y, ass_escape(t).upper()))
+        if word_mode:
+            lines.append("Dialogue: 0,%s,%s,Word,,0,0,0,,{\\pos(%d,%d)"
+                         "\\fscx130\\fscy130\\t(0,90,\\fscx100\\fscy100)}%s" % (
+                             fmt_ass_time(s), fmt_ass_time(e), W // 2, y,
+                             ass_escape(t).upper()))
+        else:
+            lines.append("Dialogue: 0,%s,%s,Cap,,0,0,0,,{\\pos(%d,%d)}%s" % (
+                fmt_ass_time(s), fmt_ass_time(e), W // 2, y, ass_escape(t).upper()))
     return "\n".join(lines) + "\n"
 
 
@@ -407,22 +493,27 @@ def transcribe(path):
 
 
 def render(src, out_path, layout, events, hook=None, hook_secs=3.0,
-           cam=None, overlay=None, focus=0.5):
+           cam=None, overlay=None, focus=0.5, credit=None, endcard=None, mutes=None,
+           word_mode=False, sfx=False):
     info = probe(src)
     work = os.path.dirname(os.path.abspath(src))
     with open(os.path.join(work, "subs.ass"), "w", encoding="utf-8", newline="\n") as f:
-        f.write(build_ass(events, layout, hook, hook_secs, info["dur"]))
+        f.write(build_ass(events, layout, hook, hook_secs, info["dur"],
+                          credit=credit, endcard=endcard, word_mode=word_mode))
     kind = None
     cmd = [tool("ffmpeg"), "-y", "-v", "error", "-i", src]
     if overlay:
         o = probe(overlay)
         kind = "full" if o["w"] and o["h"] and o["h"] > o["w"] * 1.5 else "logo"
         cmd += ["-loop", "1", "-i", overlay]
-    has_subs = bool(events or hook)
-    cmd += ["-filter_complex", build_filter(layout, cam, kind, subs=has_subs, focus=focus),
-            "-map", "[vout]"]
+    has_subs = bool(events or hook or credit or endcard)
+    graph = build_filter(layout, cam, kind, subs=has_subs, focus=focus)
+    agraph = build_audio(info["dur"], mutes, sfx, bool(endcard)) if info["audio"] else None
+    if agraph:
+        graph += ";" + agraph
+    cmd += ["-filter_complex", graph, "-map", "[vout]"]
     if info["audio"]:
-        cmd += ["-map", "0:a:0", "-c:a", "aac", "-b:a", "160k"]
+        cmd += ["-map", "[aout]" if agraph else "0:a:0", "-c:a", "aac", "-b:a", "160k"]
     cmd += ["-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
             "-movflags", "+faststart", "-shortest", "-t", "%.3f" % info["dur"],
             os.path.abspath(out_path)]
@@ -460,6 +551,9 @@ def main(argv=None):
     ap.add_argument("--focus", type=float, default=0.5,
                     help="gameplay crop position 0=left..1=right (0.35 dodges a top-right facecam)")
     ap.add_argument("--no-captions", action="store_true")
+    ap.add_argument("--phrase-captions", action="store_true",
+                    help="2-3 word captions instead of the default one-word pop")
+    ap.add_argument("--no-sfx", action="store_true", help="skip whoosh/ding")
     ap.add_argument("--no-downloads-copy", action="store_true")
     a = ap.parse_args(argv)
 
@@ -493,21 +587,24 @@ def main(argv=None):
             clip = download_section(a.url, start, end, work)
         else:
             clip = cut_local(a.file, start, end, work)
-        events = []
+        events, mutes = [], []
         if not a.no_captions:
             print("[2/4] transcribing (whisper %s, cpu)..." % WHISPER_MODEL)
             words = transcribe(clip)
             if words is None:
                 print("WARN: faster-whisper not installed -> no captions")
             else:
-                events = chunk_words(words)
-                print("      %d words -> %d caption events" % (len(words), len(events)))
+                words, mutes = censor_words(words)
+                events = chunk_words(words, max_words=3 if a.phrase_captions else 1)
+                print("      %d words -> %d caption events, %d slur(s) muted"
+                      % (len(words), len(events), len(mutes)))
         else:
             print("[2/4] captions skipped")
         print("[3/4] rendering %dx%d (%s layout)..." % (W, H, a.layout))
         hook_secs = None if a.hook_secs == 0 else a.hook_secs
         info = render(clip, out_mp4, a.layout, events, a.hook, hook_secs, cam, overlay,
-                      focus=a.focus)
+                      focus=a.focus, credit=c.get("credit"), endcard=c.get("endcard"),
+                      mutes=mutes, word_mode=not a.phrase_captions, sfx=not a.no_sfx)
     finally:
         shutil.rmtree(work, ignore_errors=True)
 

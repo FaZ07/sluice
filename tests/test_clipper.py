@@ -64,6 +64,38 @@ class TestCaptions(unittest.TestCase):
         self.assertLess(ev[1][1], 5.0)             # not across the 3.5s pause
         self.assertGreaterEqual(ev[1][1] - ev[1][0], 0.4)   # minimum show time
 
+    def test_censor_mutes_and_stars_slurs_only(self):
+        words = [(0.0, 0.3, " what"), (0.3, 0.6, " nigga"), (0.6, 0.9, " niggas,"),
+                 (0.9, 1.2, " bitch"), (1.2, 1.5, " retarded"), (1.5, 1.8, " night")]
+        out, mutes = clip.censor_words(words)
+        self.assertEqual([w for _, _, w in out],
+                         [" what", " ****", " ****,", " bitch", " ****", " night"])
+        self.assertEqual(len(mutes), 3)
+        self.assertIn("between(t,0.25,0.65)", clip.mute_filter(mutes))
+        self.assertIsNone(clip.mute_filter([]))
+
+    def test_audio_graph_beep_and_sfx(self):
+        g = clip.build_audio(30.0, [(1.0, 1.4)], sfx=True, endcard=True)
+        self.assertIn("between(t,1.00,1.40)", g)
+        self.assertIn("sine=frequency=1000", g)        # bleep
+        self.assertIn("anoisesrc", g)                  # whoosh
+        self.assertIn("adelay=27000|27000", g)         # ding at the end card
+        self.assertTrue(g.endswith("amix=inputs=4:normalize=0:duration=first[aout]"))
+        self.assertIsNone(clip.build_audio(30.0, [], sfx=False))
+
+    def test_word_mode_pops_single_words(self):
+        a = clip.build_ass([(0.0, 0.4, "no")], "stack", word_mode=True)
+        self.assertIn(",Word,", a)
+        self.assertIn("\\fscx130", a)
+        self.assertIn("}NO", a)
+
+    def test_credit_and_endcard_lines(self):
+        a = clip.build_ass([], "stack", clip_secs=30.0, credit="dasgasd3m on Kick",
+                           endcard="WATCH DOM LIVE: kick.com/dasgasd3m")
+        self.assertIn("0:00:00.00,0:00:30.00,Credit", a)
+        self.assertIn("0:00:27.00,0:00:30.00,Hook", a)
+        self.assertIn("kick.com/dasgasd3m", clip.post_caption("dom", "t"))
+
     def test_empty_words(self):
         self.assertEqual(clip.chunk_words([]), [])
         self.assertEqual(clip.chunk_words([(0, 1, "  ")]), [])
@@ -172,6 +204,17 @@ class TestRenderReal(unittest.TestCase):
                            overlay=self.logo)
         self.assertEqual((info["w"], info["h"]), (1080, 1920))
         self.assertAlmostEqual(info["dur"], 8.0, delta=0.3)
+
+    def test_beep_sfx_word_mode_render(self):
+        src = self._cut("beep")
+        out = os.path.join(self.td, "beep.mp4")
+        info = clip.render(src, out, "stack", [(0.5, 0.9, "bro"), (1.0, 1.3, "****")],
+                           cam=(1400, 0, 520, 300), focus=0.35, credit="x on Kick",
+                           endcard="WATCH LIVE", mutes=[(1.0, 1.3)],
+                           word_mode=True, sfx=True)
+        self.assertEqual((info["w"], info["h"]), (1080, 1920))
+        self.assertAlmostEqual(info["dur"], 8.0, delta=0.3)
+        self.assertTrue(info["audio"])
 
     def test_center_no_subs(self):
         src = self._cut("center")
