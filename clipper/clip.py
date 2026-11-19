@@ -543,7 +543,10 @@ def render(src, out_path, layout, events, hook=None, hook_secs=3.0,
     cmd += ["-filter_complex", graph, "-map", "[vout]"]
     if info["audio"]:
         cmd += ["-map", "[aout]" if agraph else "0:a:0", "-c:a", "aac", "-b:a", "160k"]
+    # -map_metadata -1 / -fflags +bitexact: drop source + tool metadata
+    # (encoder tags, creation time) so uploads carry no editing fingerprints.
     cmd += ["-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+            "-map_metadata", "-1", "-fflags", "+bitexact",
             "-movflags", "+faststart", "-shortest", "-t", "%.3f" % info["dur"],
             os.path.abspath(out_path)]
     run(cmd, cwd=work)   # cwd=work so 'subtitles=subs.ass' needs no path escaping
