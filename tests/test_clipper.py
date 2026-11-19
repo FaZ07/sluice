@@ -92,6 +92,12 @@ class TestFilterAndCampaigns(unittest.TestCase):
         g = clip.build_filter("stack", cam=(10, 20, 300, 200))
         self.assertIn("vstack", g)
 
+    def test_focus_moves_crop_and_is_bounded(self):
+        self.assertIn("(iw-1080)*0.350", clip.build_filter("center", focus=0.35))
+        self.assertIn("(iw-1080)*0.500", clip.build_filter("stack", cam=(0, 0, 10, 10)))
+        with self.assertRaises(ValueError):
+            clip.build_filter("center", focus=1.5)
+
     def test_stack_needs_cam(self):
         with self.assertRaises(ValueError):
             clip.build_filter("stack")

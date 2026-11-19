@@ -244,8 +244,10 @@ def build_ass(events, layout="fit", hook=None, hook_secs=3.0, clip_secs=None):
     ]
     if hook:
         end = clip_secs if (hook_secs is None and clip_secs) else (hook_secs or 3.0)
+        # stack: sit on the seam between facecam and gameplay, not on a face
+        hook_y = 640 if layout == "stack" else 330
         lines.append("Dialogue: 1,%s,%s,Hook,,0,0,0,,{\\pos(%d,%d)}%s" % (
-            fmt_ass_time(0), fmt_ass_time(end), W // 2, 330, ass_escape(hook)))
+            fmt_ass_time(0), fmt_ass_time(end), W // 2, hook_y, ass_escape(hook)))
     for s, e, t in events:
         lines.append("Dialogue: 0,%s,%s,Cap,,0,0,0,,{\\pos(%d,%d)}%s" % (
             fmt_ass_time(s), fmt_ass_time(e), W // 2, y, ass_escape(t).upper()))
@@ -260,11 +262,17 @@ def parse_cam(text):
     return tuple(parts)
 
 
-def build_filter(layout, cam=None, overlay_kind=None, subs=True):
+def build_filter(layout, cam=None, overlay_kind=None, subs=True, focus=0.5):
     """ffmpeg -filter_complex graph. Input 0 = clip, input 1 = overlay image.
 
     overlay_kind: None, 'full' (9:16 frame-sized overlay) or 'logo' (corner).
+    focus: horizontal position of the gameplay crop, 0 = left edge, 1 = right
+    edge (center/stack). Streamer facecam insets usually sit top-right, so
+    ~0.35 keeps the inset out of the gameplay panel.
     """
+    if not 0.0 <= focus <= 1.0:
+        raise ValueError("focus must be between 0 and 1")
+    fx = "(iw-%d)*%.3f" % (W, focus)
     if layout == "fit":
         g = ("[0:v]split[a][b];"
              "[a]scale=%d:%d:force_original_aspect_ratio=increase,crop=%d:%d,"
@@ -272,7 +280,7 @@ def build_filter(layout, cam=None, overlay_kind=None, subs=True):
              "[b]scale=%d:-2[fg];"
              "[bg][fg]overlay=(W-w)/2:(H-h)/2[v0]" % (W, H, W, H, W))
     elif layout == "center":
-        g = "[0:v]scale=-2:%d,crop=%d:%d[v0]" % (H, W, H)
+        g = "[0:v]scale=-2:%d,crop=%d:%d:%s:0[v0]" % (H, W, H, fx)
     elif layout == "stack":
         if not cam:
             raise ValueError("stack layout needs --cam x:y:w:h (facecam box)")
@@ -281,9 +289,9 @@ def build_filter(layout, cam=None, overlay_kind=None, subs=True):
         g = ("[0:v]split[a][b];"
              "[a]crop=%d:%d:%d:%d,scale=%d:%d:force_original_aspect_ratio=increase,"
              "crop=%d:%d[cam];"
-             "[b]scale=-2:%d,crop=%d:%d[game];"
+             "[b]scale=-2:%d,crop=%d:%d:%s:0[game];"
              "[cam][game]vstack[v0]" % (cw, ch, x, y, W, top_h, W, top_h,
-                                         H - top_h, W, H - top_h))
+                                         H - top_h, W, H - top_h, fx))
     else:
         raise ValueError("layout must be fit, center or stack")
     last = "v0"
@@ -303,8 +311,8 @@ def build_filter(layout, cam=None, overlay_kind=None, subs=True):
 # Apply to every campaign (VIRAL_NOTES.md, top rules).
 COMMON_RULES = [
     "Opens on the payoff/reaction, not the setup; hook text asks a question",
-    "No GTA radio music in the clip (Content ID claims)",
-    "No story spoilers or cutscenes (Rockstar takedowns)",
+    "Radio music OK, but if YouTube BLOCKS the clip (not just claims it), re-cut without it",
+    "Spoilers OK inside the clip: say 'SPOILER' in the hook, never in the title/cover; skip long full cutscenes/ending",
     "English title with streamer name + topic, e.g. 'Dylan Page GTA 6 police chase'",
     "Post in US evening hours (early morning IST)",
     "Submit the post link within 30 minutes, to ONE campaign only",
@@ -399,7 +407,7 @@ def transcribe(path):
 
 
 def render(src, out_path, layout, events, hook=None, hook_secs=3.0,
-           cam=None, overlay=None):
+           cam=None, overlay=None, focus=0.5):
     info = probe(src)
     work = os.path.dirname(os.path.abspath(src))
     with open(os.path.join(work, "subs.ass"), "w", encoding="utf-8", newline="\n") as f:
@@ -411,7 +419,7 @@ def render(src, out_path, layout, events, hook=None, hook_secs=3.0,
         kind = "full" if o["w"] and o["h"] and o["h"] > o["w"] * 1.5 else "logo"
         cmd += ["-loop", "1", "-i", overlay]
     has_subs = bool(events or hook)
-    cmd += ["-filter_complex", build_filter(layout, cam, kind, subs=has_subs),
+    cmd += ["-filter_complex", build_filter(layout, cam, kind, subs=has_subs, focus=focus),
             "-map", "[vout]"]
     if info["audio"]:
         cmd += ["-map", "0:a:0", "-c:a", "aac", "-b:a", "160k"]
@@ -449,6 +457,8 @@ def main(argv=None):
                     help="how long the hook shows; 0 = whole clip")
     ap.add_argument("--layout", default="fit", choices=["fit", "center", "stack"])
     ap.add_argument("--cam", help="facecam box x:y:w:h in source pixels (stack layout)")
+    ap.add_argument("--focus", type=float, default=0.5,
+                    help="gameplay crop position 0=left..1=right (0.35 dodges a top-right facecam)")
     ap.add_argument("--no-captions", action="store_true")
     ap.add_argument("--no-downloads-copy", action="store_true")
     a = ap.parse_args(argv)
@@ -496,7 +506,8 @@ def main(argv=None):
             print("[2/4] captions skipped")
         print("[3/4] rendering %dx%d (%s layout)..." % (W, H, a.layout))
         hook_secs = None if a.hook_secs == 0 else a.hook_secs
-        info = render(clip, out_mp4, a.layout, events, a.hook, hook_secs, cam, overlay)
+        info = render(clip, out_mp4, a.layout, events, a.hook, hook_secs, cam, overlay,
+                      focus=a.focus)
     finally:
         shutil.rmtree(work, ignore_errors=True)
 
