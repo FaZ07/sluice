@@ -1,0 +1,234 @@
+{
+ "name": "pov-ep04-boat",
+ "series": "flood",
+ "part": 4,
+ "partLabel": "PART 4 🚤",
+ "module": "flood4.js",
+ "ending": "boat",
+ "duration": 44.0,
+ "fps": 30,
+ "title": "POV: You Stayed In The Shelter... Then The Water Came In 🌊 Part 4 #POV #Shorts",
+ "description": "Part 4 (BOAT route). You stayed in the shelter. Then the water came in - the bleachers, the wave, the ladder to the roof. Part 5 is the finale.\n\n#POV #Survival #ChooseYourAdventure #Hurricane #Miami #Shorts",
+ "tags": "pov, survival, choose your adventure, flood, miami flood, storm surge, hurricane, would you survive, shelter, pov story, animated story, survival story, what would you do, part 4, shorts",
+ "thumb": {
+  "text": "THE WATER<br>CAME IN",
+  "frame": 498
+ },
+ "hud": {
+  "place": "MIAMI, FL",
+  "clock": [
+   [
+    0,
+    "4:05 AM"
+   ],
+   [
+    30,
+    "4:31 AM"
+   ]
+  ],
+  "alert": "HURRICANE WARNING",
+  "countdown": 0,
+  "meter": false
+ },
+ "hooks": [
+  {
+   "t0": 0.0,
+   "t1": 2.0,
+   "text": "YOU STAYED"
+  }
+ ],
+ "choice": {
+  "t0": 40.0,
+  "q": "TO BE CONTINUED...",
+  "a": "",
+  "b": "",
+  "foot": "PART 5: THE FINALE 👇 FOLLOW SO YOU DON'T MISS IT"
+ },
+ "voices": {
+  "narr": "en-US-AndrewNeural",
+  "medic": "en-US-AriaNeural",
+  "neighbor": "en-US-JennyNeural"
+ },
+ "lines": [
+  {
+   "t": 0.2,
+   "who": "narr",
+   "text": "You stay in the shelter."
+  },
+  {
+   "t": 2.4,
+   "who": "neighbor",
+   "text": "IT'S STILL RISING!"
+  },
+  {
+   "t": 4.6,
+   "who": "medic",
+   "text": "EVERYONE ON THE BLEACHERS!"
+  },
+  {
+   "t": 7.0,
+   "who": "narr",
+   "text": "You wade through the dark."
+  },
+  {
+   "t": 9.2,
+   "who": "narr",
+   "text": "Up. Row after row."
+  },
+  {
+   "t": 11.4,
+   "who": "narr",
+   "text": "Below you, the gym is a swimming pool."
+  },
+  {
+   "t": 13.9,
+   "who": "narr",
+   "text": "And it keeps climbing."
+  },
+  {
+   "t": 15.9,
+   "who": "neighbor",
+   "text": "WAVE! HOLD ON!"
+  },
+  {
+   "t": 18.2,
+   "who": "narr",
+   "text": "It throws the cots across the room."
+  },
+  {
+   "t": 20.4,
+   "who": "narr",
+   "text": "Now it's two rows below you."
+  },
+  {
+   "t": 22.6,
+   "who": "medic",
+   "text": "THE ROOF! THERE'S A LADDER!"
+  },
+  {
+   "t": 25.2,
+   "who": "narr",
+   "text": "You push along the top row."
+  },
+  {
+   "t": 27.2,
+   "who": "narr",
+   "text": "Up the ladder."
+  },
+  {
+   "t": 29.7,
+   "who": "narr",
+   "text": "You force the hatch open."
+  },
+  {
+   "t": 31.6,
+   "who": "narr",
+   "text": "On the roof, the wind is brutal."
+  },
+  {
+   "t": 34.2,
+   "who": "narr",
+   "text": "You pull the others up, one by one."
+  },
+  {
+   "t": 37.0,
+   "who": "narr",
+   "text": "Now you just have to survive until morning."
+  },
+  {
+   "t": 40.4,
+   "who": "narr",
+   "text": "Part five is the last one. Follow so you don't miss it."
+  }
+ ],
+ "sfx": {
+  "lightning": [
+   3.0,
+   9.0,
+   15.0,
+   21.0,
+   27.0,
+   31.8,
+   35.0,
+   38.5,
+   42.0
+  ],
+  "rain_keys": [
+   [
+    0,
+    0.3
+   ],
+   [
+    29.5,
+    0.3
+   ],
+   [
+    29.8,
+    0.65
+   ],
+   [
+    44,
+    0.65
+   ]
+  ],
+  "rum_keys": [
+   [
+    0,
+    0.7
+   ],
+   [
+    44,
+    0.7
+   ]
+  ],
+  "roar_keys": [
+   [
+    0,
+    0.8
+   ],
+   [
+    29.5,
+    0.8
+   ],
+   [
+    29.8,
+    1.35
+   ],
+   [
+    44,
+    1.3
+   ]
+  ],
+  "crowd_keys": [
+   [
+    0,
+    0.3
+   ],
+   [
+    14,
+    0.32
+   ],
+   [
+    29.5,
+    0.2
+   ],
+   [
+    31.4,
+    0.12
+   ],
+   [
+    44,
+    0.12
+   ]
+  ],
+  "surge": 15.9,
+  "splash": [
+   16.6,
+   17.4
+  ],
+  "bangs": [
+   29.8,
+   30.1
+  ]
+ }
+}

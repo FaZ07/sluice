@@ -22,7 +22,7 @@ export const calm = t => t < EYE[0] ? 0 : t < EYE[1] ? ease((t - EYE[0]) / (EYE[
   : t < EYE[3] ? 1 - ease((t - EYE[2]) / (EYE[3] - EYE[2])) : 0;
 
 // ---------- builders ----------
-function person(parent, vest, x, y, z, s = 1, seated = false) {
+export function person(parent, vest, x, y, z, s = 1, seated = false) {
   const g = new THREE.Group(); g.position.set(x, y, z); g.scale.setScalar(s); parent.add(g);
   const legs = box(0.36, seated ? 0.42 : 0.8, 0.24, 0x2b2f3a, 0, seated ? 0.21 : 0.4, seated ? 0.12 : 0, g);
   if (seated) legs.rotation.x = 0;
@@ -37,7 +37,7 @@ function person(parent, vest, x, y, z, s = 1, seated = false) {
   return g;
 }
 
-function car(parent, color, x, y, z, ry) {
+export function car(parent, color, x, y, z, ry) {
   const c = new THREE.Group();
   box(1.9, 0.6, 4.0, color, 0, 0.5, 0, c, true); box(1.6, 0.55, 2.0, color, 0, 1.05, -0.2, c, true);
   box(1.62, 0.4, 1.0, new THREE.MeshBasicMaterial({ color: 0x223040 }), 0, 1.05, 0.55, c);
@@ -49,7 +49,7 @@ function car(parent, color, x, y, z, ry) {
   return c;
 }
 
-function sign(text, w, h, bg, fg, px) {                    // canvas-text plane (browser only)
+export function sign(text, w, h, bg, fg, px) {                    // canvas-text plane (browser only)
   if (typeof document === "undefined") return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: bg }));
   const cv = document.createElement("canvas"); cv.width = 1024; cv.height = Math.round(1024 * h / w);
   const g = cv.getContext("2d");
@@ -246,7 +246,7 @@ export function buildWorld(spec) {
   [[1, -118, 24, 0], [1, -110, 36, Math.PI], [2, -120, 33, 0.05], [3, -108, 25, Math.PI], [4, -115, 37, 0]].forEach(([k, x, z, ry], i) =>
     car(gar, [0xf2f2f2, 0x2d6cdf, 0x222222, 0xd94141, 0xf5c518][i], x, G.decks[k] + 0.16, z, ry));
   // stair tower on the gym-facing corner, lit
-  const st = new THREE.Group(); st.position.set(G.x1 - 1.6, 0, G.z0 - 1.6); gar.add(st);
+  const st = new THREE.Group(); st.position.set(G.x1 - 1.6, 0, G.z0 - 1.6); gar.add(st); W.stair = st;
   box(3.2, 15.6, 3.2, 0xa8a196, 0, 7.2 + 7.8, 0, st, true);
   for (let k = 0; k < 5; k++) box(0.06, 1.6, 1.4, new THREE.MeshBasicMaterial({ color: 0xfff1c8 }), 1.62, 8.6 + k * 3.2, 0, st);
   box(0.05, 0.4, 1.0, new THREE.MeshBasicMaterial({ color: 0x23e06a }), 1.63, 10.0, 0, st);
@@ -371,10 +371,13 @@ export const heliPos3 = t => V(keyed([[0, -68], [3.0, -86]], t), keyed([[0, 21],
 
 // ---------- per-frame update ----------
 export function update(W, cam, arms, t, spec) {
-  const T = t, end = W.ending || spec.ending;
-  const L = waterLevel3(T), k = calm(T), wallOn = T >= EYE[3];
-  const S = shotsFor3(end), shot = shotAt3(end, T);
-  const u = clamp((T - shot.t0) / (shot.t1 - shot.t0), 0, 1);
+  // Parts 4-5 reuse this world: W.offset shifts world time, W.waterFn(t) overrides the level,
+  // W.shots replaces the shot list (timed in local t), W.pre(t, C, L) runs just before the camera.
+  const T = t + (W.offset || 0), end = W.ending || spec.ending;
+  const L = W.waterFn ? W.waterFn(t) : waterLevel3(T), k = W.offset ? 0 : calm(T), wallOn = T >= EYE[3];
+  const S = W.shots || shotsFor3(end), tc = W.shots ? t : T;
+  const shot = S.find(s => tc >= s.t0 && tc < s.t1) || S[S.length - 1];
+  const u = clamp((tc - shot.t0) / (shot.t1 - shot.t0), 0, 1);
   const C = {};
 
   // helicopter (heli intro) or parked boat
@@ -460,8 +463,9 @@ export function update(W, cam, arms, t, spec) {
   W.eyewall.visible = T > EYE[0] - 0.2 && T < EYE[3] + 0.4;
   W.eyewall.position.set(-110 - 230 * wu, 0, 0);        // the east side of the wall closes on you
 
+  if (W.pre) W.pre(t, C, L, shot);
   // camera
-  const [p, look, fov, sh] = shot.cam(u, T, C);
+  const [p, look, fov, sh] = shot.cam(u, tc, C);
   const n1 = Math.sin(T * 37.1) + 0.6 * Math.sin(T * 23.7 + 1.3), n2 = Math.sin(T * 31.3 + 2.1) + 0.6 * Math.sin(T * 19.9);
   cam.position.set(p.x + sh * n1, p.y + sh * n2 + 0.01 * Math.sin(T * 7.0), p.z);
   cam.fov = fov; cam.updateProjectionMatrix();
@@ -469,13 +473,14 @@ export function update(W, cam, arms, t, spec) {
   cam.rotateZ(sh * 0.8 * Math.sin(T * 17.3));
 
   // arms
-  const pose = shot.arms(u, T);
+  const pose = shot.arms(u, tc);
   for (const [key, s] of [["L", -1], ["R", 1]]) {
     const a = arms[key], h = pose[key];
     a.g.visible = !!h;
     if (h) placeArm(a, V(0.34 * s, -0.5, 0.2), V(...h), s);
   }
-  arms.X.g.visible = false;
+  arms.X.g.visible = !!pose.X;
+  if (pose.X) placeArm(arms.X, V(0.2, 0.75, -0.9), V(...pose.X), -1);
 
   // sea: chop that dies in the eye and doubles in the back wall; flat inside the gym
   const amp = 0.28 * (1 - 0.8 * k) * (wallOn ? 1.6 : 1);

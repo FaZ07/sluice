@@ -1,0 +1,172 @@
+{
+ "name": "pov-ep05-boat",
+ "series": "flood",
+ "part": 5,
+ "partLabel": "PART 5 🚤",
+ "module": "flood5.js",
+ "ending": "boat",
+ "duration": 44.0,
+ "fps": 30,
+ "title": "POV: You Survived The Night... And The Helicopter Came Back 🚁 Part 5 (Finale) #POV #Shorts",
+ "description": "Part 5, the finale of the BOAT route. Morning after the hurricane - and the helicopter you didn't pick in Part 2 comes for you. Which route would you pick? The helicopter route ends a different way.\n\n#POV #Survival #ChooseYourAdventure #Hurricane #Miami #Shorts",
+ "tags": "pov, survival, choose your adventure, flood, miami flood, storm surge, hurricane, would you survive, shelter, pov story, animated story, survival story, what would you do, part 5, finale, shorts",
+ "thumb": {
+  "text": "I SURVIVED<br>ALL 5 PARTS",
+  "frame": 690
+ },
+ "hud": {
+  "place": "MIAMI, FL",
+  "clock": [
+   [
+    0,
+    "6:48 AM"
+   ],
+   [
+    24,
+    "6:52 AM"
+   ]
+  ],
+  "alert": "FLOOD WARNING",
+  "countdown": 0,
+  "meter": false
+ },
+ "hooks": [
+  {
+   "t0": 0.0,
+   "t1": 2.2,
+   "text": "PART 5: MORNING"
+  }
+ ],
+ "choice": {
+  "t0": 33.0,
+  "win": true,
+  "q": "YOU SURVIVED ✅",
+  "a": "🚤 BOAT ROUTE: COMPLETE",
+  "b": "🚁 TRY THE HELI ROUTE",
+  "foot": "WHICH ROUTE WOULD YOU PICK? COMMENT 👇"
+ },
+ "voices": {
+  "narr": "en-US-AndrewNeural",
+  "rescuer": "en-US-ChristopherNeural",
+  "neighbor": "en-US-JennyNeural"
+ },
+ "lines": [
+  {
+   "t": 0.2,
+   "who": "narr",
+   "text": "Morning."
+  },
+  {
+   "t": 2.6,
+   "who": "narr",
+   "text": "The storm is gone. Miami is a lake."
+  },
+  {
+   "t": 5.4,
+   "who": "neighbor",
+   "text": "LISTEN! UP THERE!"
+  },
+  {
+   "t": 7.6,
+   "who": "narr",
+   "text": "A helicopter."
+  },
+  {
+   "t": 10.0,
+   "who": "narr",
+   "text": "The one you didn't pick in part two."
+  },
+  {
+   "t": 12.4,
+   "who": "rescuer",
+   "text": "FAMILIES WITH KIDS FIRST!"
+  },
+  {
+   "t": 15.0,
+   "who": "narr",
+   "text": "A mother and her son go up first."
+  },
+  {
+   "t": 17.8,
+   "who": "narr",
+   "text": "Then it's your turn."
+  },
+  {
+   "t": 20.2,
+   "who": "narr",
+   "text": "You step into the basket."
+  },
+  {
+   "t": 22.8,
+   "who": "narr",
+   "text": "From up here, you see what the storm did."
+  },
+  {
+   "t": 25.9,
+   "who": "rescuer",
+   "text": "WELCOME ABOARD. YOU'RE SAFE NOW."
+  },
+  {
+   "t": 28.9,
+   "who": "narr",
+   "text": "Five parts. One night."
+  },
+  {
+   "t": 30.6,
+   "who": "narr",
+   "text": "You survived."
+  },
+  {
+   "t": 33.4,
+   "who": "narr",
+   "text": "Which route would you pick? Tell me in the comments."
+  },
+  {
+   "t": 36.8,
+   "who": "narr",
+   "text": "The helicopter route ends a different way."
+  }
+ ],
+ "sfx": {
+  "rain_keys": [
+   [
+    0,
+    0.0
+   ],
+   [
+    44,
+    0.0
+   ]
+  ],
+  "rum_keys": [
+   [
+    0,
+    0.06
+   ],
+   [
+    44,
+    0.06
+   ]
+  ],
+  "heli": [
+   5.0,
+   44.0
+  ],
+  "heli_fade": 4.5,
+  "heli_vol": 1.0,
+  "crowd_keys": [
+   [
+    0,
+    0.1
+   ],
+   [
+    8,
+    0.2
+   ],
+   [
+    44,
+    0.12
+   ]
+  ]
+ }
+}

@@ -45,7 +45,9 @@ check("boat visible on the roof", W2.boat.visible === true);
 // Part 2 + Part 3 endings: shots tile, camera is a pure function of t, nothing goes NaN
 import * as F2 from "./flood2.js";
 import * as F3 from "./flood3.js";
-for (const [mod, shots, tag] of [[F2, F2.shotsFor, "p2"], [F3, F3.shotsFor3, "p3"]]) {
+import * as F4 from "./flood4.js";
+import * as F5 from "./flood5.js";
+for (const [mod, shots, tag] of [[F2, F2.shotsFor, "p2"], [F3, F3.shotsFor3, "p3"], [F4, F4.shotsFor4, "p4"], [F5, F5.shotsFor5, "p5"]]) {
   for (const end of ["boat", "heli"]) {
     const sp = { ending: end, sfx: { lightning: [1, 20] } };
     const S = shots(end);
@@ -65,6 +67,12 @@ let rising = true;
 for (let t = 0; t < 44; t += 0.1) if (F3.waterLevel3(t + 0.1) + 1e-9 < F3.waterLevel3(t)) rising = false;
 check("p3 water never falls", rising);
 check("p3 gym floods only after the eyewall", F3.waterLevel3(F3.EYE[3]) < F3.FLOOR && F3.waterLevel3(30) > F3.FLOOR);
+
+let rising4 = true;
+for (let t = 0; t < 44; t += 0.1) if (F4.waterLevel4(t + 0.1) + 1e-9 < F4.waterLevel4(t)) rising4 = false;
+check("p4 water never falls", rising4);
+check("p4 stay: your rows stay dry while you stand on them", F4.waterLevel4(22.4) < F3.FLOOR + 0.5 * 6 && F4.waterLevel4(27.0) < F3.FLOOR + 0.5 * 7);
+check("p5 boat reaches the garage before you jump", F5.boatPose5(14.8).p.distanceTo(new THREE.Vector3(-102.6, 0, 30.5)) < 0.01);
 
 console.log(`${ok}/${n} checks passed`);
 process.exit(ok === n ? 0 : 1);
