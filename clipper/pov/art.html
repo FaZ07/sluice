@@ -1,0 +1,40 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>pov art</title>
+<style>html,body{margin:0;overflow:hidden;background:#000}canvas{position:absolute;left:0;top:0}</style></head>
+<body><canvas id="c"></canvas>
+<script type="module">
+// Channel-art stills from the flood world: no HUD, no arms, free camera.
+//   art.html?w=2560&h=1440&t=38&cam=x,y,z&look=x,y,z&fov=50   (frame number is ignored)
+import * as THREE from "./vendor/three.module.min.js";
+import { buildWorld, buildArms, update } from "./flood.js";
+
+const q = new URLSearchParams(location.search);
+const Wd = Number(q.get("w") || 2560), Ht = Number(q.get("h") || 1440);
+const vec = s => s.split(",").map(Number);
+let spec = { sfx: { lightning: [] } };
+try { spec = await (await fetch("build/pov-ep01/page.json")).json(); spec.sfx.lightning = []; } catch {}
+
+const canvas = document.getElementById("c");
+canvas.style.width = Wd + "px"; canvas.style.height = Ht + "px";
+document.body.style.width = Wd + "px"; document.body.style.height = Ht + "px";
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(Wd, Ht, false);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const W = buildWorld(spec);
+const cam = new THREE.PerspectiveCamera(50, Wd / Ht, 0.05, 400);
+W.scene.add(cam);
+const arms = buildArms(cam, spec);
+if (W.bubbles) cam.add(W.bubbles);
+
+window.renderFrame = async () => {
+  update(W, cam, arms, Number(q.get("t") || 38), spec);
+  cam.aspect = Wd / Ht; cam.fov = Number(q.get("fov") || 50); cam.updateProjectionMatrix();
+  cam.position.set(...vec(q.get("cam") || "-1,9,9"));
+  cam.lookAt(new THREE.Vector3(...vec(q.get("look") || "-4,5,-14")));
+  arms.L.g.visible = arms.R.g.visible = false;
+  renderer.render(W.scene, cam);
+  await new Promise(r => requestAnimationFrame(() => r()));
+};
+window.__info = { art: `${Wd}x${Ht}` };
+window.__ready = true;
+</script></body></html>
