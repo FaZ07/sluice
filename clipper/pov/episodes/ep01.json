@@ -1,0 +1,45 @@
+{
+  "name": "pov-ep01",
+  "series": "flood",
+  "part": 1,
+  "duration": 45.0,
+  "fps": 30,
+  "title": "You Have 40 Seconds Before Miami Floods... Boat or Helicopter? 🌊 #POV #Shorts",
+  "description": "POV: a storm surge hits Miami at 3 AM and you have 40 seconds. Boat or helicopter? Comment your choice - Part 2 decides if you survive.\n\n#POV #Survival #ChooseYourAdventure #Miami #Flood #Shorts",
+  "tags": "pov, survival, choose your adventure, flood, miami flood, storm surge, hurricane, would you survive, boat or helicopter, pov story, animated story, survival story, what would you do, part 1, shorts",
+  "hud": {"place": "MIAMI, FL", "clock": [[0, "3:12 AM"], [22, "3:13 AM"]], "alert": "STORM SURGE WARNING", "countdown": 40},
+  "hooks": [
+    {"t0": 0.0, "t1": 2.4, "text": "YOU HAVE 40 SECONDS"}
+  ],
+  "choice": {"t0": 40.0, "q": "WHAT DO YOU DO?", "a": "🚤 BOAT", "b": "🚁 HELICOPTER",
+             "foot": "COMMENT 👇  PART 2 DECIDES IF YOU LIVE"},
+  "voices": {"narr": "en-US-AndrewNeural", "neighbor": "en-US-AriaNeural", "rescuer": "en-US-ChristopherNeural"},
+  "lines": [
+    {"t": 0.15, "who": "narr", "text": "3 AM in Miami. The water is already under your door."},
+    {"t": 3.85, "who": "narr", "text": "You open it."},
+    {"t": 4.6,  "who": "neighbor", "text": "GET OUT! THE SEAWALL BROKE!"},
+    {"t": 7.15, "who": "narr", "text": "In ten seconds, it's at your waist."},
+    {"t": 9.3,  "who": "narr", "text": "The door won't open. The window won't break."},
+    {"t": 12.1, "who": "narr", "text": "Then it reaches the ceiling."},
+    {"t": 15.8, "who": "narr", "text": "One breath left. Find the hatch."},
+    {"t": 19.9, "who": "narr", "text": "Air. But the attic is flooding too."},
+    {"t": 22.3, "who": "narr", "text": "So you punch through the roof."},
+    {"t": 26.4, "who": "rescuer", "text": "HOLD ON! WE SEE YOU!"},
+    {"t": 28.9, "who": "narr", "text": "A boat on the left. A helicopter above."},
+    {"t": 31.3, "who": "narr", "text": "But the roof is cracking. You only get one shot."},
+    {"t": 36.6, "who": "narr", "text": "Boat... or helicopter?"},
+    {"t": 40.3, "who": "narr", "text": "Comment your choice. Part two decides if you live."}
+  ],
+  "sfx": {
+    "lightning": [0.6, 5.4, 23.6, 29.4, 34.2],
+    "surge": 3.75,
+    "bangs": [10.5, 10.95, 11.4],
+    "underwater": [14.6, 19.9],
+    "punches": [21.7, 22.1, 22.5],
+    "roof_break": 22.6,
+    "rain_out": 23.2,
+    "boat": [25.2, 40.0],
+    "heli": [26.5, 40.0],
+    "crack": 31.2
+  }
+}
