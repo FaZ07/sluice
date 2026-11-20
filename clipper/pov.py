@@ -159,13 +159,49 @@ def sfx_graph(spec, n_lines):
     if "heli" in sx:
         a, b = sx["heli"]
         d = ms(a)
+        out = ""
+        if "heli_out" in sx:                       # flies away: fade out from heli_out to b
+            out = ",afade=t=out:st=%g:d=%g" % (sx["heli_out"] - a, max(0.1, b - sx["heli_out"]))
         add("heli", "anoisesrc=d=%g:c=brown:r=48000:a=0.9:seed=51,lowpass=f=650,tremolo=f=11:d=0.95,"
-            "afade=t=in:d=4,volume=0.8,adelay=%d|%d" % (b - a, d, d))
+            "afade=t=in:d=%g%s,volume=%g,adelay=%d|%d" % (b - a, sx.get("heli_fade", 4), out, sx.get("heli_vol", 0.8), d, d))
     if "boat" in sx:
         a, b = sx["boat"]
         d = ms(a)
         add("boat", "aevalsrc='0.35*sin(2*PI*92*t)+0.2*sin(2*PI*184*t)+0.1*sin(2*PI*276*t)':d=%g:s=48000,"
-            "tremolo=f=24:d=0.6,lowpass=f=900,afade=t=in:d=5,volume=0.22,adelay=%d|%d" % (b - a, d, d))
+            "tremolo=f=24:d=0.6,lowpass=f=900,afade=t=in:d=%g,volume=%g,adelay=%d|%d"
+            % (b - a, sx.get("boat_fade", 5), sx.get("boat_vol", 0.22), d, d))
+    if "rev" in sx:                                # throttle open: a higher, harder motor layer
+        d, L = ms(sx["rev"]), D - sx["rev"]
+        add("rev", "aevalsrc='0.3*sin(2*PI*138*t)+0.22*sin(2*PI*276*t)+0.12*sin(2*PI*414*t)':d=%g:s=48000,"
+            "tremolo=f=36:d=0.5,lowpass=f=1400,afade=t=in:d=1.6,afade=t=out:st=%g:d=4,volume=0.3,adelay=%d|%d"
+            % (L, max(0, L - 13), d, d))
+    if "collapse" in sx:                           # the house goes under: deep crunch + long rumble
+        d = ms(sx["collapse"])
+        add("col", "anoisesrc=d=3.5:c=brown:r=48000:a=1:seed=71,lowpass=f=220,afade=t=in:d=0.05,"
+            "afade=t=out:st=0.6:d=2.9,volume=1.8,adelay=%d|%d" % (d, d))
+        add("colk", "anoisesrc=d=1.2:c=white:r=48000:a=0.9:seed=72,bandpass=f=900:w=1400,tremolo=f=18:d=0.9,"
+            "afade=t=out:st=0.1:d=1.1,volume=0.9,adelay=%d|%d" % (d, d))
+    for i, st in enumerate(sx.get("splash", [])):
+        d = ms(st)
+        add("spl%d" % i, "anoisesrc=d=1.4:c=pink:r=48000:a=0.9:seed=%d,bandpass=f=1100:w=1800,afade=t=in:d=0.03,"
+            "afade=t=out:st=0.15:d=1.2,volume=1.1,adelay=%d|%d" % (80 + i, d, d))
+    if "zap" in sx:                                # live power line in the water: crackle + mains hum
+        a, b = sx["zap"]
+        d = ms(a)
+        add("zap", "anoisesrc=d=%g:c=white:r=48000:a=0.8:seed=91,highpass=f=2500,tremolo=f=37:d=1,tremolo=f=6.3:d=0.8,"
+            "afade=t=in:d=1.2,afade=t=out:st=%g:d=1.5,volume=0.55,adelay=%d|%d" % (b - a, max(0, b - a - 1.5), d, d))
+        add("hum", "aevalsrc='0.3*sin(2*PI*60*t)+0.2*sin(2*PI*120*t)':d=%g:s=48000,afade=t=in:d=1.2,"
+            "afade=t=out:st=%g:d=1.5,volume=0.5,adelay=%d|%d" % (b - a, max(0, b - a - 1.5), d, d))
+    if "gust" in sx:                               # wind gust: band-limited noise swelling and fading
+        a, b = sx["gust"]
+        d, L = ms(a), b - a
+        add("gust", "anoisesrc=d=%g:c=pink:r=48000:a=1:seed=95,bandpass=f=500:w=700,tremolo=f=1.3:d=0.5,"
+            "afade=t=in:d=1.0,afade=t=out:st=%g:d=%g,volume=1.4,adelay=%d|%d" % (L, L * 0.55, L * 0.45, d, d))
+    if "sirens" in sx:                             # distant two-tone siren
+        a, b = sx["sirens"]
+        d = ms(a)
+        add("sir", "aevalsrc='0.25*sin(2*PI*(740+180*gte(mod(t,1.4),0.7))*t)':d=%g:s=48000,lowpass=f=1800,"
+            "afade=t=in:d=3,volume=0.35,adelay=%d|%d" % (b - a, d, d))
     if "crack" in sx:
         d = ms(sx["crack"])
         add("crk", "anoisesrc=d=1.6:c=white:r=48000:a=0.8:seed=61,highpass=f=1400,tremolo=f=28:d=1,"
@@ -173,8 +209,12 @@ def sfx_graph(spec, n_lines):
     # choice card: two-note sting
     c0 = spec["choice"]["t0"]
     d = ms(c0)
-    add("sting", "aevalsrc='0.5*sin(2*PI*660*t)*exp(-5*t)+0.5*sin(2*PI*990*t)*exp(-5*(t-0.14))*gte(t,0.14)':d=1.2:s=48000,"
-        "adelay=%d|%d" % (d, d))
+    if spec["choice"].get("win"):                  # survived: rising three-note major chime
+        add("sting", "aevalsrc='0.45*sin(2*PI*523*t)*exp(-4*t)+0.45*sin(2*PI*659*t)*exp(-4*(t-0.13))*gte(t,0.13)"
+            "+0.5*sin(2*PI*784*t)*exp(-3*(t-0.26))*gte(t,0.26)':d=1.6:s=48000,adelay=%d|%d" % (d, d))
+    else:
+        add("sting", "aevalsrc='0.5*sin(2*PI*660*t)*exp(-5*t)+0.5*sin(2*PI*990*t)*exp(-5*(t-0.14))*gte(t,0.14)':d=1.2:s=48000,"
+            "adelay=%d|%d" % (d, d))
 
     voices = []
     for i in range(n_lines):

@@ -1,0 +1,50 @@
+{
+  "name": "pov-ep02-boat",
+  "series": "flood",
+  "part": 2,
+  "partLabel": "PART 2 🚤",
+  "module": "flood2.js",
+  "ending": "boat",
+  "duration": 38.0,
+  "fps": 30,
+  "title": "POV: You Picked The Boat... Did You Survive The Miami Flood? 🚤 Part 2 #POV #Shorts",
+  "description": "Part 2 - the BOAT ending. The roof is breaking, the boat is right there, you have to jump. Would you have picked the boat? The helicopter ending is the other Part 2.\n\n#POV #Survival #ChooseYourAdventure #Miami #Flood #Shorts",
+  "tags": "pov, survival, choose your adventure, flood, miami flood, storm surge, hurricane, would you survive, boat or helicopter, boat ending, pov story, animated story, survival story, what would you do, part 2, shorts",
+  "thumb": {"text": "I PICKED<br>THE BOAT", "frame": 84},
+  "hud": {"place": "MIAMI, FL", "clock": [[0, "3:13 AM"], [20, "3:14 AM"]], "alert": "STORM SURGE WARNING", "countdown": 0, "meter": false},
+  "hooks": [
+    {"t0": 0.0, "t1": 2.0, "text": "YOU PICKED THE BOAT"}
+  ],
+  "choice": {"t0": 31.0, "win": true, "q": "YOU SURVIVED ✅", "a": "🚤 THE BOAT MADE IT", "b": "🚁 HELI ENDING = OTHER PART 2",
+             "foot": "WOULD YOU HAVE JUMPED? COMMENT 👇"},
+  "voices": {"narr": "en-US-AndrewNeural", "rescuer": "en-US-ChristopherNeural", "medic": "en-US-AriaNeural"},
+  "lines": [
+    {"t": 0.2,  "who": "narr", "text": "You pick the boat."},
+    {"t": 1.4,  "who": "rescuer", "text": "JUMP! JUMP NOW!"},
+    {"t": 3.9,  "who": "narr", "text": "The roof splits under your feet."},
+    {"t": 5.9,  "who": "narr", "text": "Three steps. Then you jump."},
+    {"t": 8.7,  "who": "narr", "text": "Behind you, your house goes under."},
+    {"t": 11.0, "who": "narr", "text": "The driver floors it."},
+    {"t": 13.0, "who": "narr", "text": "Floating cars come out of the dark."},
+    {"t": 17.1, "who": "rescuer", "text": "POWER LINE! GET DOWN!"},
+    {"t": 19.7, "who": "narr", "text": "It misses your head by inches."},
+    {"t": 22.2, "who": "narr", "text": "Then you see lights."},
+    {"t": 24.0, "who": "narr", "text": "A highway, still above the water."},
+    {"t": 26.7, "who": "medic", "text": "YOU MADE IT! GRAB MY HAND!"},
+    {"t": 29.4, "who": "narr", "text": "You survived the boat."},
+    {"t": 31.4, "who": "narr", "text": "Would you have jumped? Tell me in the comments."},
+    {"t": 34.6, "who": "narr", "text": "The helicopter ending is the other part two."}
+  ],
+  "sfx": {
+    "lightning": [1.2, 12.0, 21.0, 33.0],
+    "rain_out": 0,
+    "crack": 3.8,
+    "collapse": 8.9,
+    "splash": [7.3, 8.6, 9.15],
+    "boat": [0.0, 38.0], "boat_fade": 0.5, "boat_vol": 0.3,
+    "rev": 9.4,
+    "heli": [0.0, 12.0], "heli_fade": 0.1, "heli_out": 10.0,
+    "zap": [16.4, 21.0],
+    "sirens": [21.5, 38.0]
+  }
+}

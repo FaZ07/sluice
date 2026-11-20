@@ -287,7 +287,7 @@ export function buildWorld(spec) {
   }
 
   return { scene, hemi, moon, lamp, attic, lampBulb, door, hatch, breakable, crack, floaters, cars, boat, heli, rotor,
-    bolt, water, wbase, surge, rain, rpos, rseed, bubbles, glass, SKY, town };
+    bolt, water, wbase, surge, rain, rpos, rseed, bubbles, glass, SKY, town, house };
 }
 
 // ---------- POV arms ----------
@@ -503,3 +503,6 @@ export function update(W, cam, arms, t, spec) {
 
   return { L, under, flash, shot: SHOTS.indexOf(shot) };
 }
+
+// shared with the Part 2 endings (flood2.js)
+export { clamp, lerp, ease, V, lerpV, toon, OUTLINE, box, placeArm };

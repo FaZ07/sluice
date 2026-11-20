@@ -1,0 +1,46 @@
+{
+  "name": "pov-ep02-heli",
+  "series": "flood",
+  "part": 2,
+  "partLabel": "PART 2 🚁",
+  "module": "flood2.js",
+  "ending": "heli",
+  "duration": 36.0,
+  "fps": 30,
+  "title": "POV: You Picked The Helicopter... Did You Survive The Miami Flood? 🚁 Part 2 #POV #Shorts",
+  "description": "Part 2 - the HELICOPTER ending. The basket comes down, the roof gives way, and then the wind hits. Would you have grabbed the basket? The boat ending is the other Part 2.\n\n#POV #Survival #ChooseYourAdventure #Miami #Flood #Shorts",
+  "tags": "pov, survival, choose your adventure, flood, miami flood, storm surge, hurricane, would you survive, boat or helicopter, helicopter rescue, pov story, animated story, survival story, what would you do, part 2, shorts",
+  "thumb": {"text": "I PICKED THE<br>HELICOPTER", "frame": 405},
+  "hud": {"place": "MIAMI, FL", "clock": [[0, "3:13 AM"], [20, "3:14 AM"]], "alert": "STORM SURGE WARNING", "countdown": 0, "meter": false},
+  "hooks": [
+    {"t0": 0.0, "t1": 2.0, "text": "YOU PICKED THE HELICOPTER"}
+  ],
+  "choice": {"t0": 28.0, "win": true, "q": "YOU SURVIVED ✅", "a": "🚁 THE HELICOPTER MADE IT", "b": "🚤 BOAT ENDING = OTHER PART 2",
+             "foot": "WOULD YOU HAVE GRABBED IT? COMMENT 👇"},
+  "voices": {"narr": "en-US-AndrewNeural", "rescuer": "en-US-ChristopherNeural"},
+  "lines": [
+    {"t": 0.2,  "who": "narr", "text": "You pick the helicopter."},
+    {"t": 2.2,  "who": "rescuer", "text": "GRAB THE BASKET!"},
+    {"t": 3.7,  "who": "narr", "text": "The rotor wind almost throws you off."},
+    {"t": 6.0,  "who": "narr", "text": "The roof drops. You dive in."},
+    {"t": 8.6,  "who": "narr", "text": "Under you, your house disappears."},
+    {"t": 11.2, "who": "narr", "text": "Then a gust hits."},
+    {"t": 12.4, "who": "rescuer", "text": "HOLD ON! DON'T LET GO!"},
+    {"t": 15.0, "who": "narr", "text": "Then, slowly, it stops."},
+    {"t": 17.0, "who": "narr", "text": "From up here, all of Miami is underwater."},
+    {"t": 21.1, "who": "rescuer", "text": "GIVE ME YOUR HAND!"},
+    {"t": 23.2, "who": "rescuer", "text": "GOT YOU. YOU'RE SAFE."},
+    {"t": 25.5, "who": "narr", "text": "You survived the helicopter."},
+    {"t": 28.4, "who": "narr", "text": "Would you have grabbed the basket? Comment below."},
+    {"t": 31.6, "who": "narr", "text": "The boat ending is the other part two."}
+  ],
+  "sfx": {
+    "lightning": [1.0, 13.4, 19.6, 30.0],
+    "rain_out": 0,
+    "crack": 5.4,
+    "collapse": 8.4,
+    "splash": [8.65],
+    "heli": [0.0, 36.0], "heli_fade": 0.1, "heli_vol": 1.3,
+    "gust": [11.6, 17.2]
+  }
+}
