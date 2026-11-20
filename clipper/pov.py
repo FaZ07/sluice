@@ -106,6 +106,15 @@ def place_words(spec, timed):
     return words
 
 
+def level(keys):
+    """[[t, v], ...] -> ffmpeg volume expression: linear ramps between keys, held at the ends."""
+    keys = sorted(keys)
+    expr = "%g" % keys[-1][1]
+    for (t0, v0), (t1, v1) in reversed(list(zip(keys, keys[1:]))):
+        expr = "if(lt(t,%g),%g+(%g)*(t-%g)/%g,%s)" % (t1, v0, v1 - v0, t0, max(1e-6, t1 - t0), expr)
+    return "if(lt(t,%g),%g,%s)" % (keys[0][0], keys[0][1], expr)
+
+
 def sfx_graph(spec, n_lines):
     """ffmpeg filter graph: narration inputs [1..n] + synthesized sound design.
 
@@ -125,10 +134,33 @@ def sfx_graph(spec, n_lines):
     out_t = sx.get("rain_out", D)
     u0, u1 = sx.get("underwater", [D, D])
     # storm bed: rain (quiet indoors, loud on the roof, gone underwater) + low rumble
+    rain_v = level(sx["rain_keys"]) if "rain_keys" in sx else         "if(between(t,%g,%g),0.02,if(lt(t,%g),0.10,0.42))" % (u0, u1, out_t)
+    rum_v = level(sx["rum_keys"]) if "rum_keys" in sx else "if(between(t,%g,%g),0.15,0.45)" % (u0, u1)
     add("rain", "anoisesrc=d=%g:c=pink:r=48000:a=0.6:seed=11,highpass=f=1200,lowpass=f=6000,"
-        "volume='if(between(t,%g,%g),0.02,if(lt(t,%g),0.10,0.42))':eval=frame" % (D, u0, u1, out_t))
+        "volume='%s':eval=frame" % (D, rain_v))
     add("rum", "anoisesrc=d=%g:c=brown:r=48000:a=0.7:seed=12,lowpass=f=260,"
-        "volume='if(between(t,%g,%g),0.15,0.45)':eval=frame" % (D, u0, u1))
+        "volume='%s':eval=frame" % (D, rum_v))
+    if "roar_keys" in sx:                          # hurricane wind: a roaring band that follows inside/outside
+        add("roar", "anoisesrc=d=%g:c=pink:r=48000:a=1:seed=14,bandpass=f=420:w=600,tremolo=f=0.7:d=0.4,"
+            "volume='%s':eval=frame" % (D, level(sx["roar_keys"])))
+    if "crowd_keys" in sx:                         # murmur of a full shelter
+        add("crowd", "anoisesrc=d=%g:c=pink:r=48000:a=0.8:seed=15,bandpass=f=650:w=500,tremolo=f=3.1:d=0.5,tremolo=f=0.9:d=0.4,"
+            "volume='%s':eval=frame" % (D, level(sx["crowd_keys"])))
+    if "eerie" in sx:                              # the eye: a low hanging tone in the silence
+        a, b = sx["eerie"]
+        d = ms(a)
+        add("eer", "aevalsrc='0.3*sin(2*PI*110*t)+0.18*sin(2*PI*164.8*t)+0.1*sin(2*PI*220.5*t)':d=%g:s=48000,"
+            "tremolo=f=0.4:d=0.5,afade=t=in:d=2,afade=t=out:st=%g:d=1.5,volume=0.35,adelay=%d|%d" % (b - a, max(0, b - a - 1.5), d, d))
+    for i, gt in enumerate(sx.get("glass", [])):  # windows bursting
+        d = ms(gt)
+        add("gl%d" % i, "anoisesrc=d=1.6:c=white:r=48000:a=1:seed=%d,highpass=f=2800,afade=t=in:d=0.01,"
+            "afade=t=out:st=0.05:d=1.5,volume=1.3,adelay=%d|%d" % (110 + i, d, d))
+        add("gt%d" % i, "aevalsrc='0.25*sin(2*PI*3150*t)*exp(-6*t)+0.2*sin(2*PI*4720*t)*exp(-5*(t-0.21))*gte(t,0.21)"
+            "+0.18*sin(2*PI*3900*t)*exp(-6*(t-0.47))*gte(t,0.47)':d=1.4:s=48000,adelay=%d|%d" % (d, d))
+    for i, rt in enumerate(sx.get("radio", [])):  # radio static bursts
+        d = ms(rt)
+        add("rd%d" % i, "anoisesrc=d=0.45:c=white:r=48000:a=0.8:seed=%d,bandpass=f=2200:w=2400,tremolo=f=45:d=0.7,"
+            "afade=t=out:st=0.2:d=0.25,volume=0.45,adelay=%d|%d" % (120 + i, d, d))
     # door surge: a rushing wall of water
     if "surge" in sx:
         add("surge", "anoisesrc=d=3:c=white:r=48000:a=0.9:seed=13,bandpass=f=700:w=900,"

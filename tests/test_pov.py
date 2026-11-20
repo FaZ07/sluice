@@ -69,6 +69,27 @@ class TestPovSpec(unittest.TestCase):
         with self.assertRaises(ValueError):
             pov.place_words(s, timed)
 
+    def test_all_episodes_valid(self):
+        for f in sorted(EP01.parent.glob("ep*.json")):
+            spec = json.loads(f.read_text(encoding="utf-8"))
+            self.assertEqual(pov.validate(spec), [], f.name)
+
+    def test_level_expression(self):
+        e = pov.level([[2, 0.5], [0, 0.1], [4, 0.0]])          # unsorted keys are sorted
+        self.assertTrue(e.startswith("if(lt(t,0),0.1,"))
+        self.assertIn("if(lt(t,2),0.1+(0.4)*(t-0)/2,", e)
+        self.assertTrue(e.endswith(",0)))"))
+
+    def test_part2_part3_sound_events(self):
+        for f, labels in (("ep02a.json", ("[col]", "[spl0]", "[zap]", "[rev]", "[sir]")),
+                          ("ep02b.json", ("[gust]", "[col]")),
+                          ("ep03a.json", ("[roar]", "[crowd]", "[eer]", "[gl0]", "[rd0]", "[surge]"))):
+            spec = json.loads((EP01.parent / f).read_text(encoding="utf-8"))
+            g = pov.sfx_graph(spec, len(spec["lines"]))
+            for lab in labels:
+                self.assertIn(lab, g, f)
+            self.assertEqual(g, pov.sfx_graph(spec, len(spec["lines"])))
+
     def test_sfx_graph_mentions_every_event(self):
         g = pov.sfx_graph(small_spec("x"), 2)
         for lab in ("[rain]", "[th0]", "[th1]", "[surge]", "[uw]", "[hb]", "[heli]", "[boat]", "[crk]", "[sting]", "[a]"):

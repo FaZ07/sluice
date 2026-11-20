@@ -42,5 +42,29 @@ check("same underwater state", i1.under === i2.under && i1.under === true);
 check("roof shot above water", update(W2, c2, a2, 24.0, spec).under === false);
 check("boat visible on the roof", W2.boat.visible === true);
 
+// Part 2 + Part 3 endings: shots tile, camera is a pure function of t, nothing goes NaN
+import * as F2 from "./flood2.js";
+import * as F3 from "./flood3.js";
+for (const [mod, shots, tag] of [[F2, F2.shotsFor, "p2"], [F3, F3.shotsFor3, "p3"]]) {
+  for (const end of ["boat", "heli"]) {
+    const sp = { ending: end, sfx: { lightning: [1, 20] } };
+    const S = shots(end);
+    check(`${tag} ${end} shots tile`, S[0].t0 === 0 && S.every((s, i) => !i || s.t0 === S[i - 1].t1));
+    const mk = () => { const w = mod.buildWorld(sp), c = new THREE.PerspectiveCamera(60, 9 / 16, 0.05, 400); w.scene.add(c); return [w, c, mod.buildArms(c, sp)]; };
+    const [wa, ca, aa] = mk(), [wb, cb, ab] = mk();
+    let finite = true;
+    for (let t = 0; t < 40; t += 0.5) { mod.update(wa, ca, aa, t, sp); if (!Number.isFinite(ca.position.x + ca.position.y)) finite = false; }
+    mod.update(wa, ca, aa, 13.0, sp); mod.update(wb, cb, ab, 13.0, sp);
+    ca.updateMatrixWorld(); cb.updateMatrixWorld();
+    check(`${tag} ${end} finite`, finite);
+    check(`${tag} ${end} deterministic`, ca.matrixWorld.elements.every((v, k) => Math.abs(v - cb.matrixWorld.elements[k]) < 1e-9));
+  }
+}
+check("p2 ducked head clears the power line", F2.HAZ.wire.low - (F2.waterLevel2(19.2) + 0.15 + 1.0) > 0.5);
+let rising = true;
+for (let t = 0; t < 44; t += 0.1) if (F3.waterLevel3(t + 0.1) + 1e-9 < F3.waterLevel3(t)) rising = false;
+check("p3 water never falls", rising);
+check("p3 gym floods only after the eyewall", F3.waterLevel3(F3.EYE[3]) < F3.FLOOR && F3.waterLevel3(30) > F3.FLOOR);
+
 console.log(`${ok}/${n} checks passed`);
 process.exit(ok === n ? 0 : 1);

@@ -29,6 +29,7 @@
   #ba{top:700px;background:#1e88e5}
   #bb{top:970px;background:#ff6d00}
   #q.win{color:#4ef07a;font-size:104px}
+  #choice.small .btn{font-size:62px;text-align:center;line-height:1.1;padding:0 30px;box-sizing:border-box}
   #choice.win .btn{font-size:58px;text-align:center;line-height:1.1;padding:0 30px;box-sizing:border-box}
   #foot{position:absolute;left:60px;width:960px;top:1250px;text-align:center;font-size:50px;line-height:1.2;color:#ffd54a}
   #thumbtxt{position:absolute;left:30px;width:1020px;top:330px;text-align:center;font-size:150px;line-height:1.0;color:#ffd54a;display:none}
@@ -71,6 +72,7 @@ $("part").textContent = spec.partLabel || "PART " + (spec.part || 1);
 $("q").textContent = spec.choice.q; $("ba").textContent = spec.choice.a; $("bb").textContent = spec.choice.b;
 $("foot").textContent = spec.choice.foot;
 if (spec.choice.win) { $("q").className = "stroke win"; $("choice").className = "win"; }
+if (spec.choice.small) $("choice").className = "small";
 if (!spec.choice.a) $("ba").style.display = "none";
 if (!spec.choice.b) $("bb").style.display = "none";
 const thumb = q.get("thumb");
@@ -102,6 +104,7 @@ function overlay(t, info) {
   $("cap").textContent = w && !thumb ? w.w : "";
   $("cap").className = "stroke" + (w && w.who !== "narr" ? " shout" : "");
   $("cap").style.transform = w ? `scale(${pop(t - w.s)})` : "";
+  $("cap").style.top = (spec.choice.win || spec.choice.small) && t >= spec.choice.t0 ? "1420px" : "";
   const c = t - spec.choice.t0;
   $("choice").style.opacity = c >= 0 ? Math.min(1, c / 0.3) : 0;
   $("ba").style.transform = `translateX(${c < 0.35 ? -1200 * (1 - Math.max(0, c) / 0.35) : 0}px) scale(${c > 0.4 ? 1 + 0.03 * Math.sin(c * 6) : 1})`;

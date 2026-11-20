@@ -1,0 +1,357 @@
+{
+ "name": "pov-ep03-boat",
+ "series": "flood",
+ "part": 3,
+ "partLabel": "PART 3 🚤",
+ "module": "flood3.js",
+ "ending": "boat",
+ "duration": 44.0,
+ "fps": 30,
+ "title": "POV: You Survived The Flood... Then The Hurricane's Eye Passed 🌀 Part 3 #POV #Shorts",
+ "description": "Part 3 (after the BOAT ending). You made it to a shelter on high ground. Then the rain stopped - the eye of the hurricane - and the other half came back. Stay in the shelter or run for the garage? Comment - Part 4 decides.\n\n#POV #Survival #ChooseYourAdventure #Hurricane #Miami #Shorts",
+ "tags": "pov, survival, choose your adventure, flood, miami flood, storm surge, hurricane, eye of the storm, hurricane eye, would you survive, shelter, pov story, animated story, survival story, what would you do, part 3, shorts",
+ "thumb": {
+  "text": "THE STORM<br>STOPPED...?",
+  "frame": 465
+ },
+ "hud": {
+  "place": "MIAMI, FL",
+  "clock": [
+   [
+    0,
+    "3:31 AM"
+   ],
+   [
+    24,
+    "3:52 AM"
+   ]
+  ],
+  "alert": "HURRICANE WARNING",
+  "countdown": 0,
+  "meter": false
+ },
+ "hooks": [
+  {
+   "t0": 0.0,
+   "t1": 2.0,
+   "text": "PART 3: THE SHELTER"
+  }
+ ],
+ "choice": {
+  "t0": 39.0,
+  "small": true,
+  "q": "WHAT DO YOU DO?",
+  "a": "🏫 STAY IN THE SHELTER",
+  "b": "🅿️ RUN FOR THE GARAGE",
+  "foot": "COMMENT 👇  PART 4 DECIDES IF YOU LIVE"
+ },
+ "voices": {
+  "narr": "en-US-AndrewNeural",
+  "medic": "en-US-AriaNeural",
+  "radio": "en-US-ChristopherNeural",
+  "neighbor": "en-US-JennyNeural"
+ },
+ "lines": [
+  {
+   "t": 0.2,
+   "who": "narr",
+   "text": "You made it to the highway."
+  },
+  {
+   "t": 2.0,
+   "who": "medic",
+   "text": "THERE'S A SHELTER UP THE HILL. COME ON!"
+  },
+  {
+   "t": 5.2,
+   "who": "narr",
+   "text": "A school on high ground. Hundreds of people inside."
+  },
+  {
+   "t": 8.0,
+   "who": "radio",
+   "text": "The eye is passing over. Stay inside."
+  },
+  {
+   "t": 12.6,
+   "who": "narr",
+   "text": "Then the rain just... stops."
+  },
+  {
+   "t": 14.8,
+   "who": "narr",
+   "text": "No wind. No rain. Stars."
+  },
+  {
+   "t": 17.2,
+   "who": "narr",
+   "text": "That's the eye of the hurricane."
+  },
+  {
+   "t": 19.4,
+   "who": "narr",
+   "text": "And the other half is coming."
+  },
+  {
+   "t": 22.8,
+   "who": "neighbor",
+   "text": "GET INSIDE! NOW!"
+  },
+  {
+   "t": 25.3,
+   "who": "narr",
+   "text": "The windows blow in."
+  },
+  {
+   "t": 26.9,
+   "who": "narr",
+   "text": "Then the power dies."
+  },
+  {
+   "t": 28.6,
+   "who": "neighbor",
+   "text": "THE WATER'S COMING IN!"
+  },
+  {
+   "t": 30.8,
+   "who": "narr",
+   "text": "Next door, the parking garage still has lights."
+  },
+  {
+   "t": 33.4,
+   "who": "narr",
+   "text": "Five floors up. But you'd have to run through the storm."
+  },
+  {
+   "t": 36.2,
+   "who": "narr",
+   "text": "Stay in the shelter... or run for the garage?"
+  },
+  {
+   "t": 39.3,
+   "who": "narr",
+   "text": "Comment your choice. Part four decides if you live."
+  }
+ ],
+ "sfx": {
+  "lightning": [
+   3.0,
+   8.0,
+   19.8,
+   21.2,
+   23.0,
+   24.0,
+   27.5,
+   31.5,
+   35.0,
+   40.0
+  ],
+  "rain_keys": [
+   [
+    0,
+    0.42
+   ],
+   [
+    7.2,
+    0.42
+   ],
+   [
+    7.6,
+    0.12
+   ],
+   [
+    12.4,
+    0.12
+   ],
+   [
+    12.6,
+    0.3
+   ],
+   [
+    14.0,
+    0.0
+   ],
+   [
+    22.5,
+    0.0
+   ],
+   [
+    22.7,
+    0.65
+   ],
+   [
+    24.3,
+    0.65
+   ],
+   [
+    24.5,
+    0.22
+   ],
+   [
+    25.0,
+    0.35
+   ],
+   [
+    30.5,
+    0.35
+   ],
+   [
+    30.7,
+    0.55
+   ],
+   [
+    32.9,
+    0.55
+   ],
+   [
+    33.1,
+    0.35
+   ],
+   [
+    35.5,
+    0.35
+   ],
+   [
+    35.7,
+    0.55
+   ],
+   [
+    44,
+    0.55
+   ]
+  ],
+  "rum_keys": [
+   [
+    0,
+    0.45
+   ],
+   [
+    12.6,
+    0.4
+   ],
+   [
+    14.0,
+    0.06
+   ],
+   [
+    21.6,
+    0.1
+   ],
+   [
+    22.6,
+    0.8
+   ],
+   [
+    44,
+    0.7
+   ]
+  ],
+  "roar_keys": [
+   [
+    0,
+    0.0
+   ],
+   [
+    21.8,
+    0.0
+   ],
+   [
+    22.6,
+    1.3
+   ],
+   [
+    24.3,
+    1.3
+   ],
+   [
+    24.5,
+    0.6
+   ],
+   [
+    25.0,
+    0.9
+   ],
+   [
+    30.5,
+    0.9
+   ],
+   [
+    30.7,
+    1.2
+   ],
+   [
+    32.9,
+    1.2
+   ],
+   [
+    33.1,
+    0.9
+   ],
+   [
+    35.5,
+    0.9
+   ],
+   [
+    35.7,
+    1.2
+   ],
+   [
+    44,
+    1.2
+   ]
+  ],
+  "crowd_keys": [
+   [
+    0,
+    0.0
+   ],
+   [
+    5.0,
+    0.0
+   ],
+   [
+    7.4,
+    0.28
+   ],
+   [
+    12.4,
+    0.2
+   ],
+   [
+    14.0,
+    0.0
+   ],
+   [
+    24.4,
+    0.0
+   ],
+   [
+    25.2,
+    0.35
+   ],
+   [
+    44,
+    0.3
+   ]
+  ],
+  "eerie": [
+   14.0,
+   22.4
+  ],
+  "radio": [
+   7.95,
+   11.4
+  ],
+  "glass": [
+   25.0
+  ],
+  "bangs": [
+   26.0
+  ],
+  "surge": 28.4,
+  "sirens": [
+   0.0,
+   7.0
+  ]
+ }
+}
