@@ -157,6 +157,23 @@ def sfx_graph(spec, n_lines):
             "afade=t=out:st=0.05:d=1.5,volume=1.3,adelay=%d|%d" % (110 + i, d, d))
         add("gt%d" % i, "aevalsrc='0.25*sin(2*PI*3150*t)*exp(-6*t)+0.2*sin(2*PI*4720*t)*exp(-5*(t-0.21))*gte(t,0.21)"
             "+0.18*sin(2*PI*3900*t)*exp(-6*(t-0.47))*gte(t,0.47)':d=1.4:s=48000,adelay=%d|%d" % (d, d))
+    for i, bt in enumerate(sx.get("buzz", [])):    # phone vibrating on a hand: two short pulses
+        d = ms(bt)
+        add("bz%d" % i, "aevalsrc='0.55*sin(2*PI*165*t)*gt(sin(2*PI*48*t),-0.2)*(lt(t,0.22)+between(t,0.34,0.56))':d=0.6:s=48000,"
+            "lowpass=f=900,volume=0.9,adelay=%d|%d" % (d, d))
+    for i, ct in enumerate(sx.get("creak", [])):   # floorboard / door hinge creak
+        d = ms(ct)
+        add("cr%d" % i, "aevalsrc='0.35*sin(2*PI*(210+90*sin(2*PI*1.3*t))*t)':d=1.4:s=48000,tremolo=f=31:d=0.85,"
+            "bandpass=f=600:w=900,afade=t=in:d=0.1,afade=t=out:st=0.7:d=0.7,volume=1.1,adelay=%d|%d" % (d, d))
+    for i, st in enumerate(sx.get("scare", [])):   # jump-scare hit: noise slam + sub boom
+        d = ms(st)
+        add("sc%d" % i, "anoisesrc=d=0.9:c=white:r=48000:a=1:seed=%d,highpass=f=1800,afade=t=in:d=0.005,"
+            "afade=t=out:st=0.05:d=0.8,volume=0.9,adelay=%d|%d" % (130 + i, d, d))
+        add("sb%d" % i, "aevalsrc='0.95*sin(2*PI*(48-10*t)*t)*exp(-2.2*t)':d=1.8:s=48000,volume=1.4,adelay=%d|%d" % (d, d))
+    for i, ft in enumerate(sx.get("steps", [])):   # slow footsteps on a wooden floor
+        d = ms(ft)
+        add("fs%d" % i, "aevalsrc='0.8*sin(2*PI*62*t)*exp(-26*t)+0.3*sin(2*PI*180*t)*exp(-40*t)':d=0.3:s=48000,"
+            "volume=0.55,adelay=%d|%d" % (d, d))
     for i, rt in enumerate(sx.get("radio", [])):  # radio static bursts
         d = ms(rt)
         add("rd%d" % i, "anoisesrc=d=0.45:c=white:r=48000:a=0.8:seed=%d,bandpass=f=2200:w=2400,tremolo=f=45:d=0.7,"

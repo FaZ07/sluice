@@ -74,5 +74,24 @@ check("p4 water never falls", rising4);
 check("p4 stay: your rows stay dry while you stand on them", F4.waterLevel4(22.4) < F3.FLOOR + 0.5 * 6 && F4.waterLevel4(27.0) < F3.FLOOR + 0.5 * 7);
 check("p5 boat reaches the garage before you jump", F5.boatPose5(14.8).p.distanceTo(new THREE.Vector3(-102.6, 0, 30.5)) < 0.01);
 
+// horror episode 1: shots tile, deterministic camera, messages in order, the thing only as reflection/shadow
+const H = await import("./horror1.js");
+{
+  const sp = { sfx: { lightning: [17.3, 36.0, 38.4] } };
+  check("h1 shots tile", H.SHOTS[0].t0 === 0 && H.SHOTS.every((s, i) => !i || s.t0 === H.SHOTS[i - 1].t1));
+  check("h1 messages in time order", H.MSGS.every((m, i) => !i || m[0] > H.MSGS[i - 1][0]));
+  check("h1 eyes appear while the screen is off", H.EYES_AT > H.SCREEN_OFF[0] && H.EYES_AT < H.SCREEN_OFF[1]);
+  const mk = () => { const w = H.buildWorld(sp), c = new THREE.PerspectiveCamera(60, 9 / 16, 0.05, 50); w.scene.add(c); return [w, c, H.buildArms(c, sp)]; };
+  const [wa, ca, aa] = mk(), [wb, cb, ab] = mk();
+  for (const t of [3, 20, 37]) H.update(wa, ca, aa, t, sp);
+  H.update(wa, ca, aa, 24.0, sp); H.update(wb, cb, ab, 24.0, sp);
+  ca.updateMatrixWorld(); cb.updateMatrixWorld();
+  check("h1 camera deterministic", ca.matrixWorld.elements.every((v, k) => Math.abs(v - cb.matrixWorld.elements[k]) < 1e-9));
+  let shadowOnlyInFlash = true;
+  for (let t = 0; t < 45; t += 0.05) { H.update(wa, ca, aa, t, sp); if (wa.shadow.visible && H.flashAt(sp, t) <= 0) shadowOnlyInFlash = false; }
+  check("h1 wall shadow only shows in lightning", shadowOnlyInFlash);
+  check("h1 never looks behind you", H.SHOTS.every(s => s.look.z < 1.2));
+}
+
 console.log(`${ok}/${n} checks passed`);
 process.exit(ok === n ? 0 : 1);

@@ -1,0 +1,209 @@
+{
+ "name": "pov-h01",
+ "series": "horror",
+ "part": 1,
+ "partLabel": "PART 1",
+ "module": "horror1.js",
+ "duration": 45.0,
+ "fps": 30,
+ "title": "POV: At 3:33 AM You Get A Text From Your Own Number... 😨 #POV #Scary #Shorts",
+ "description": "POV: it's 3:33 AM and your phone gets a text from your own number: \"don't turn around.\" Turn around or run for the door? Comment your choice - Part 2 decides if you live.\n\n#POV #Scary #Horror #ScaryStory #ChooseYourAdventure #Shorts",
+ "tags": "pov, scary, horror, scary story, horror story, 3am, 3:33, creepy, don't turn around, text from my own number, choose your adventure, would you survive, animated horror, pov story, part 1, shorts",
+ "thumb": {
+  "text": "DON'T<br>TURN<br>AROUND",
+  "frame": 1081
+ },
+ "capTop": 1480,
+ "hud": {
+  "place": "YOUR BEDROOM",
+  "clock": [
+   [
+    0,
+    "3:33 AM"
+   ],
+   [
+    30,
+    "3:34 AM"
+   ]
+  ],
+  "alert": "",
+  "countdown": 0,
+  "meter": false
+ },
+ "hooks": [
+  {
+   "t0": 0.0,
+   "t1": 2.4,
+   "text": "DON'T TURN AROUND"
+  }
+ ],
+ "choice": {
+  "t0": 40.0,
+  "small": true,
+  "q": "WHAT DO YOU DO?",
+  "a": "🔄 TURN AROUND",
+  "b": "🚪 RUN FOR THE DOOR",
+  "foot": "COMMENT 👇  PART 2 DECIDES IF YOU LIVE"
+ },
+ "voices": {
+  "narr": "en-US-AndrewNeural",
+  "it": "en-US-AnaNeural"
+ },
+ "lines": [
+  {
+   "t": 0.2,
+   "who": "narr",
+   "text": "Three thirty-three AM. Your phone buzzes."
+  },
+  {
+   "t": 3.0,
+   "who": "narr",
+   "text": "A text. From your own number."
+  },
+  {
+   "t": 5.6,
+   "who": "narr",
+   "text": "It says: don't turn around."
+  },
+  {
+   "t": 8.4,
+   "who": "narr",
+   "text": "Then the floor creaks. Behind you."
+  },
+  {
+   "t": 11.3,
+   "who": "narr",
+   "text": "The screen goes black..."
+  },
+  {
+   "t": 12.8,
+   "who": "narr",
+   "text": "And in the reflection, you see it."
+  },
+  {
+   "t": 14.8,
+   "who": "narr",
+   "text": "You reach for the lamp."
+  },
+  {
+   "t": 16.3,
+   "who": "narr",
+   "text": "It dies."
+  },
+  {
+   "t": 17.8,
+   "who": "narr",
+   "text": "The closet. It was closed."
+  },
+  {
+   "t": 20.3,
+   "who": "narr",
+   "text": "Another text."
+  },
+  {
+   "t": 23.0,
+   "who": "narr",
+   "text": "Footsteps. Slow. Closer."
+  },
+  {
+   "t": 26.0,
+   "who": "narr",
+   "text": "It's typing."
+  },
+  {
+   "t": 27.5,
+   "who": "it",
+   "text": "Turn around."
+  },
+  {
+   "t": 29.6,
+   "who": "narr",
+   "text": "The door is closing. By itself."
+  },
+  {
+   "t": 32.4,
+   "who": "it",
+   "text": "Three."
+  },
+  {
+   "t": 33.4,
+   "who": "it",
+   "text": "Two."
+  },
+  {
+   "t": 34.4,
+   "who": "it",
+   "text": "One."
+  },
+  {
+   "t": 36.3,
+   "who": "narr",
+   "text": "Then the lightning shows you its shadow."
+  },
+  {
+   "t": 40.3,
+   "who": "narr",
+   "text": "Turn around... or run for the door? Comment. Part two decides."
+  }
+ ],
+ "sfx": {
+  "lightning": [
+   17.3,
+   36.0,
+   38.4
+  ],
+  "rain_keys": [
+   [
+    0,
+    0.07
+   ],
+   [
+    45,
+    0.07
+   ]
+  ],
+  "rum_keys": [
+   [
+    0,
+    0.1
+   ],
+   [
+    45,
+    0.1
+   ]
+  ],
+  "buzz": [
+   1.2,
+   5.4,
+   20.2,
+   21.6,
+   27.2,
+   32.4,
+   33.4,
+   34.4
+  ],
+  "creak": [
+   8.4,
+   29.4,
+   30.0
+  ],
+  "steps": [
+   23.2,
+   24.2,
+   25.2,
+   26.1
+  ],
+  "scare": [
+   12.2,
+   36.0
+  ],
+  "eerie": [
+   0.0,
+   40.0
+  ],
+  "underwater": [
+   30.0,
+   40.0
+  ]
+ }
+}
